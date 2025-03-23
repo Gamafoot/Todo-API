@@ -1,14 +1,17 @@
 package domain
 
 import (
-	"errors"
+	pkgErrors "github.com/pkg/errors"
 )
 
 var (
-	ErrUsernameIsOccupied     = errors.New("username is occupied")
-	ErrInvalidLoginOrPassword = errors.New("invalid login or password")
-	ErrPasswordsDontMatch     = errors.New("passwords don't match")
-	ErrReshreshTokenNotFound  = errors.New("refresh token not found")
-	ErrInvalidDeadlineFormat  = errors.New("invalid deadline format")
-	ErrTaskNotFound           = errors.New("task not found")
+	ErrUsernameIsOccupied     = pkgErrors.New("username is occupied")
+	ErrInvalidLoginOrPassword = pkgErrors.New("invalid login or password")
+	ErrPasswordsDontMatch     = pkgErrors.New("passwords don't match")
+	ErrReshreshTokenNotFound  = pkgErrors.New("refresh token not found")
+	ErrInvalidDeadlineFormat  = pkgErrors.New("invalid deadline format")
+	ErrTaskNotFound           = pkgErrors.New("task not found")
+
+	ErrRecordNotFound     = pkgErrors.New("record not found")
+	ErrUserNotOwnedRecord = pkgErrors.New("the user is not owner of the record")
 )

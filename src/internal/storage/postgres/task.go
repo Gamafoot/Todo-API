@@ -37,7 +37,7 @@ func (s *taskStorage) GetAmountPages(userId uint, page, limit int) (int, error) 
 	var (
 		count  int64
 		offset = (page - 1) * limit
-		tasks  = make([]*domain.Task, 0)
+		tasks  = make([]*models.Task, 0)
 	)
 
 	if err := s.db.Find(&tasks, "user_id = ?", userId).Offset(offset).Limit(limit).Count(&count).Error; err != nil {

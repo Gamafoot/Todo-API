@@ -1,148 +1,87 @@
 package service
 
 import (
+	"errors"
 	"root/internal/config"
 	"root/internal/domain"
 	"root/internal/storage"
-	"root/pkg/hash"
-	"root/pkg/jwt"
-	"time"
 
-	pkgErrors "github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
 type ProjectService interface {
-	Create(input LoginInput) (Tokens, error)
-	Delete(input RegisterInput) error
-	Update(userId uint, refreshToken string) (Tokens, error)
+	FindAll(userId uint, page, limit int) ([]*domain.Project, int, error)
+	Create(userId uint, name string) error
+	Update(userId, id uint, name string) error
+	Delete(userId, id uint) error
 }
 
 type projectService struct {
-	config       *config.Config
-	storage      *storage.Storage
-	tokenManager jwt.TokenManager
+	config  *config.Config
+	storage *storage.Storage
 }
 
-func newProjectService(cfg *config.Config, storage *storage.Storage, tokenManager jwt.TokenManager) *authService {
-	return &authService{
-		config:       cfg,
-		storage:      storage,
-		tokenManager: tokenManager,
+func newProjectService(cfg *config.Config, storage *storage.Storage) *projectService {
+	return &projectService{
+		config:  cfg,
+		storage: storage,
 	}
 }
 
-type (
-	CreateProjectInput struct {
-		UserId uint
-		Name   string
-	}
-
-	DeleteProjectInput struct {
-		Id uint
-	}
-)
-
-func (s *authService) CreateProject(input CreateProjectInput) (Tokens, error) {
-	var (
-		user   *domain.User
-		tokens Tokens
-	)
-
-	hasher := hash.NewSHA1Hasher(s.config.Hash.Salt)
-
-	user, err := s.storage.User.GetByUsername(input.Username)
+func (s *projectService) FindAll(userId uint, page, limit int) ([]*domain.Project, int, error) {
+	projects, err := s.storage.Project.FindAll(userId, page, limit)
 	if err != nil {
-		if pkgErrors.Is(err, gorm.ErrRecordNotFound) {
-			return tokens, domain.ErrInvalidLoginOrPassword
-		}
-		return tokens, err
+		return nil, 0, err
 	}
 
-	ok, err := hasher.CheckHash(user.Password, input.Password)
+	amount, err := s.storage.Project.GetAmountPages(userId, page, limit)
 	if err != nil {
-		return tokens, err
+		return nil, 0, err
+	}
+
+	return projects, amount, nil
+}
+
+func (s *projectService) Create(userId uint, name string) error {
+	return s.storage.Project.Save(&domain.Project{
+		UserId: userId,
+		Name:   name,
+	})
+}
+
+func (s *projectService) Update(userId, projectId uint, name string) error {
+	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
+	if err != nil {
+		return err
 	}
 
 	if !ok {
-		return tokens, domain.ErrInvalidLoginOrPassword
+		return domain.ErrUserNotOwnedRecord
 	}
 
-	return s.createSession(user.Id)
+	project, err := s.storage.Project.FindById(projectId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.ErrRecordNotFound
+		}
+
+		return err
+	}
+
+	project.Name = project.Name
+
+	return s.storage.Project.Save(project)
 }
 
-func (s *authService) Register(input RegisterInput) error {
-	if input.Password != input.RePassword {
-		return domain.ErrPasswordsDontMatch
-	}
-
-	hasher := hash.NewSHA1Hasher(s.config.Hash.Salt)
-
-	hash, err := hasher.Hash(input.Password)
+func (s *projectService) Delete(userId, projectId uint) error {
+	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
 	if err != nil {
 		return err
 	}
 
-	_, err = s.storage.User.GetByUsername(input.Username)
-	if err != nil {
-		if !pkgErrors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
-	} else {
-		return domain.ErrUsernameIsOccupied
+	if !ok {
+		return domain.ErrUserNotOwnedRecord
 	}
 
-	err = s.storage.User.Create(&domain.User{
-		Username: input.Username,
-		Password: hash,
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *authService) RefreshToken(userId uint, refreshToken string) (Tokens, error) {
-	tokens := Tokens{}
-
-	_, err := s.storage.Session.Get(userId, refreshToken)
-	if err != nil {
-		if pkgErrors.Is(err, gorm.ErrRecordNotFound) {
-			return tokens, domain.ErrReshreshTokenNotFound
-		}
-		return tokens, err
-	}
-
-	return s.createSession(userId)
-}
-
-func (s *authService) createSession(userId uint) (Tokens, error) {
-	var (
-		res Tokens
-		err error
-	)
-
-	res.AccessToken, err = s.tokenManager.NewJWT(userId, s.config.Jwt.AccessTokenTtl)
-	if err != nil {
-		return res, err
-	}
-
-	res.RefreshToken, err = s.tokenManager.NewRefreshToken()
-	if err != nil {
-		return res, err
-	}
-
-	session := &domain.Session{
-		UserId:       userId,
-		RefreshToken: res.RefreshToken,
-		ExpiresAt:    time.Now().Add(s.config.Jwt.RefreshTokenTtl),
-	}
-
-	err = s.storage.Session.Set(session)
-	if err != nil {
-		return res, err
-	}
-
-	return res, nil
+	return s.storage.Project.Delete(projectId)
 }

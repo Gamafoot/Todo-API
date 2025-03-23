@@ -57,7 +57,7 @@ func (s *taskService) GetChunk(userId uint, page, limit int) ([]*domain.Task, in
 		return nil, 0, err
 	}
 
-	return tasks, amount, nil
+	return tasks, int(amount), nil
 }
 
 func (s *taskService) Save(inp *TaskInput) error {
