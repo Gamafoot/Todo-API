@@ -25,3 +25,4 @@ cors:
   headers:
     - "Content-Type"
     - "Set-Cookie"
+    - "Authorization"
