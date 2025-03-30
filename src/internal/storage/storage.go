@@ -9,9 +9,9 @@ import (
 type Storage struct {
 	User    UserStorage
 	Session SessionStorage
-	Task    TaskStorage
 	Project ProjectStorage
 	Column ColumnStorage
+	Task    TaskStorage
 }
 
 func NewPostgresStorage(db *gorm.DB) *Storage {

@@ -50,28 +50,31 @@ func (s *columnStorage) GetAmountPages(columnId uint, page, limit int) (int, err
 	return int(amount), nil
 }
 
-func (s *columnStorage) FindById(id uint) (*domain.Column, error) {
+func (s *columnStorage) FindById(columnId uint) (*domain.Column, error) {
 	column := new(models.Column)
-	if err := s.db.Find(&column, "id = ?", id).Error; err != nil {
+	if err := s.db.Find(&column, "id = ?", columnId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
 	return convertColumn(column), nil
 }
 
-func (s *columnStorage) Save(column *domain.Column) error {
-	if err := s.db.Save(models.Column{
-		Id:        column.Id,
-		ProjectId: column.ProjectId,
-		Title:     column.Title,
-	}).Error; err != nil {
+func (s *columnStorage) Create(column domain.Column) error {
+	if err := s.db.Create(column).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
 }
 
-func (s *columnStorage) Delete(id uint) error {
-	if err := s.db.Delete(&models.Project{Id: id}).Error; err != nil {
+func (s *columnStorage) Update(column domain.Column) error {
+	if err := s.db.Model(models.Column{}).Where("id = ?", column.Id).Updates(column).Error; err != nil {
+		return pkgErrors.WithStack(err)
+	}
+	return nil
+}
+
+func (s *columnStorage) Delete(columnId uint) error {
+	if err := s.db.Delete(&models.Project{Id: columnId}).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
