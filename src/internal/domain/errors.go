@@ -10,8 +10,6 @@ var (
 	ErrPasswordsDontMatch     = pkgErrors.New("passwords don't match")
 	ErrReshreshTokenNotFound  = pkgErrors.New("refresh token not found")
 	ErrInvalidDeadlineFormat  = pkgErrors.New("invalid deadline format")
-	ErrTaskNotFound           = pkgErrors.New("task not found")
-
-	ErrRecordNotFound     = pkgErrors.New("record not found")
-	ErrUserNotOwnedRecord = pkgErrors.New("the user is not owner of the record")
+	ErrRecordNotFound         = pkgErrors.New("record not found")
+	ErrUserNotOwnedRecord     = pkgErrors.New("the user is not owner of the record")
 )
