@@ -11,8 +11,8 @@ import (
 
 type ColumnService interface {
 	FindAll(userId, projectId uint, page, limit int) ([]*domain.Column, int, error)
-	Create(userId, projectId uint, title string) error
-	Update(userId, columnId uint, name string) error
+	Create(userId uint, input *domain.CreateColumnInput) (*domain.Column, error)
+	Update(userId, columnId uint, input *domain.UpdateColumnInput) (*domain.Column, error)
 	Delete(userId, columnId uint) error
 }
 
@@ -46,7 +46,7 @@ func (s *columnService) FindAll(userId, projectId uint, page, limit int) ([]*dom
 	amount, err := s.storage.Task.GetAmountPages(userId, page, limit)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, 0, domain.ErrTaskNotFound
+			return nil, 0, domain.ErrRecordNotFound
 		}
 
 		return nil, 0, err
@@ -55,40 +55,61 @@ func (s *columnService) FindAll(userId, projectId uint, page, limit int) ([]*dom
 	return columns, amount, nil
 }
 
-func (s *columnService) Create(userId, projectId uint, title string) error {
-	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
+func (s *columnService) Create(userId uint, input *domain.CreateColumnInput) (*domain.Column, error) {
+	ok, err := s.storage.Project.IsOwnedUser(userId, input.ProjectId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !ok {
-		return domain.ErrUserNotOwnedRecord
+		return nil, domain.ErrUserNotOwnedRecord
 	}
 
-	return s.storage.Column.Save(&domain.Column{
-		ProjectId: projectId,
-		Title:     title,
-	})
+	column := &domain.Column{
+		ProjectId: input.ProjectId,
+		Name:      input.Name,
+	}
+
+	err = s.storage.Column.Create(column)
+	if err != nil {
+		return nil, err
+	}
+
+	return column, nil
 }
 
-func (s *columnService) Update(userId, columnId uint, title string) error {
+func (s *columnService) Update(userId, columnId uint, input *domain.UpdateColumnInput) (*domain.Column, error) {
 	ok, err := s.storage.Column.IsOwnedUser(userId, columnId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !ok {
-		return domain.ErrUserNotOwnedRecord
+		return nil, domain.ErrUserNotOwnedRecord
+	}
+
+	err = s.storage.Column.Update(&domain.Column{
+		Id:   columnId,
+		Name: input.Name,
+	})
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrRecordNotFound
+		}
+
+		return nil, err
 	}
 
 	column, err := s.storage.Column.FindById(columnId)
 	if err != nil {
-		return domain.ErrRecordNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrRecordNotFound
+		}
+
+		return nil, err
 	}
 
-	column.Title = title
-
-	return s.storage.Column.Save(column)
+	return column, nil
 }
 
 func (s *columnService) Delete(userId, columnId uint) error {

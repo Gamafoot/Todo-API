@@ -11,9 +11,9 @@ import (
 
 type ProjectService interface {
 	FindAll(userId uint, page, limit int) ([]*domain.Project, int, error)
-	Create(userId uint, name string) error
-	Update(userId, id uint, name string) error
-	Delete(userId, id uint) error
+	Create(userId uint, input *domain.CreateProjectInput) (*domain.Project, error)
+	Update(userId, projectId uint, input *domain.UpdateProjectInput) (*domain.Project, error)
+	Delete(userId, projectId uint) error
 }
 
 type projectService struct {
@@ -42,35 +42,51 @@ func (s *projectService) FindAll(userId uint, page, limit int) ([]*domain.Projec
 	return projects, amount, nil
 }
 
-func (s *projectService) Create(userId uint, name string) error {
-	return s.storage.Project.Save(&domain.Project{
+func (s *projectService) Create(userId uint, input *domain.CreateProjectInput) (*domain.Project, error) {
+	project := &domain.Project{
 		UserId: userId,
-		Name:   name,
-	})
+		Name:   input.Name,
+	}
+
+	err := s.storage.Project.Create(project)
+	if err != nil {
+		return project, nil
+	}
+
+	return project, nil
 }
 
-func (s *projectService) Update(userId, projectId uint, name string) error {
+func (s *projectService) Update(userId, projectId uint, input *domain.UpdateProjectInput) (*domain.Project, error) {
 	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !ok {
-		return domain.ErrUserNotOwnedRecord
+		return nil, domain.ErrUserNotOwnedRecord
+	}
+
+	err = s.storage.Project.Update(&domain.Project{
+		Id:   projectId,
+		Name: input.Name,
+	})
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrRecordNotFound
+		}
+
+		return nil, err
 	}
 
 	project, err := s.storage.Project.FindById(projectId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return domain.ErrRecordNotFound
+			return nil, domain.ErrRecordNotFound
 		}
-
-		return err
+		return nil, err
 	}
 
-	project.Name = project.Name
-
-	return s.storage.Project.Save(project)
+	return project, nil
 }
 
 func (s *projectService) Delete(userId, projectId uint) error {
