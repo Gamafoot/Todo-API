@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"root/internal/domain"
-	"root/internal/service"
 	customErrors "root/pkg/errors"
 	"time"
 
@@ -17,25 +16,14 @@ func (h *handler) initAuthRoutes(api *echo.Group) {
 	api.GET("/auth/refresh", h.RefreshToken, h.requiredAuth)
 }
 
-type (
-	loginInput struct {
-		Username string `json:"username" binding:"required,min=3,max=25"`
-		Password string `json:"password" binding:"required,min=8,max=64"`
-	}
-
-	loginResponse struct {
-		AccessToken string `json:"access_token"`
-	}
-)
-
 func (h *handler) Login(c echo.Context) error {
-	input := new(loginInput)
+	input := new(domain.LoginInput)
 
 	if err := c.Bind(input); err != nil {
 		return newResponse(c, http.StatusBadRequest, "invalid request body")
 	}
 
-	tokens, err := h.service.Auth.Login(service.LoginInput{
+	tokens, err := h.service.Auth.Login(&domain.LoginInput{
 		Username: input.Username,
 		Password: input.Password,
 	})
@@ -49,20 +37,14 @@ func (h *handler) Login(c echo.Context) error {
 	return setTokensToResponse(c, tokens, h.config.Jwt.RefreshTokenTtl)
 }
 
-type registerInput struct {
-	Username   string `json:"username" binding:"required,min=3,max=25"`
-	Password   string `json:"password" binding:"required,min=8,max=64"`
-	RePassword string `json:"re_password" binding:"required,min=8,max=64"`
-}
-
 func (h *handler) Register(c echo.Context) error {
-	input := new(registerInput)
+	input := new(domain.RegisterInput)
 
 	if err := c.Bind(input); err != nil {
 		return newResponse(c, http.StatusBadRequest, "invalid request body")
 	}
 
-	err := h.service.Auth.Register(service.RegisterInput{
+	err := h.service.Auth.Register(&domain.RegisterInput{
 		Username:   input.Username,
 		Password:   input.Password,
 		RePassword: input.RePassword,
@@ -100,7 +82,11 @@ func (h *handler) RefreshToken(c echo.Context) error {
 	return setTokensToResponse(c, tokens, h.config.Jwt.RefreshTokenTtl)
 }
 
-func setTokensToResponse(c echo.Context, tokens service.Tokens, refreshTokenTtl time.Duration) error {
+type refreshTokenResponse struct {
+	AccessToken string
+}
+
+func setTokensToResponse(c echo.Context, tokens *domain.Tokens, refreshTokenTtl time.Duration) error {
 	refreshTokenMaxAge := time.Now().Add(refreshTokenTtl).Second()
 
 	c.SetCookie(&http.Cookie{
@@ -112,7 +98,7 @@ func setTokensToResponse(c echo.Context, tokens service.Tokens, refreshTokenTtl 
 		MaxAge:   refreshTokenMaxAge,
 	})
 
-	return c.JSON(http.StatusOK, loginResponse{
+	return c.JSON(http.StatusOK, refreshTokenResponse{
 		AccessToken: tokens.AccessToken,
 	})
 }

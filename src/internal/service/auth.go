@@ -13,9 +13,9 @@ import (
 )
 
 type AuthService interface {
-	Login(input LoginInput) (Tokens, error)
-	Register(input RegisterInput) error
-	RefreshToken(userId uint, refreshToken string) (Tokens, error)
+	Login(input *domain.LoginInput) (*domain.Tokens, error)
+	Register(input *domain.RegisterInput) error
+	RefreshToken(userId uint, refreshToken string) (*domain.Tokens, error)
 }
 
 type authService struct {
@@ -32,53 +32,30 @@ func newAuthService(cfg *config.Config, storage *storage.Storage, tokenManager j
 	}
 }
 
-type (
-	LoginInput struct {
-		Username string
-		Password string
-	}
-
-	RegisterInput struct {
-		Username   string
-		Password   string
-		RePassword string
-	}
-
-	Tokens struct {
-		AccessToken  string
-		RefreshToken string
-	}
-)
-
-func (s *authService) Login(input LoginInput) (Tokens, error) {
-	var (
-		user   *domain.User
-		tokens Tokens
-	)
-
+func (s *authService) Login(input *domain.LoginInput) (*domain.Tokens, error) {
 	hasher := hash.NewSHA1Hasher(s.config.Hash.Salt)
 
 	user, err := s.storage.User.GetByUsername(input.Username)
 	if err != nil {
 		if pkgErrors.Is(err, gorm.ErrRecordNotFound) {
-			return tokens, domain.ErrInvalidLoginOrPassword
+			return nil, domain.ErrInvalidLoginOrPassword
 		}
-		return tokens, err
+		return nil, err
 	}
 
 	ok, err := hasher.CheckHash(user.Password, input.Password)
 	if err != nil {
-		return tokens, err
+		return nil, err
 	}
 
 	if !ok {
-		return tokens, domain.ErrInvalidLoginOrPassword
+		return nil, domain.ErrInvalidLoginOrPassword
 	}
 
 	return s.createSession(user.Id)
 }
 
-func (s *authService) Register(input RegisterInput) error {
+func (s *authService) Register(input *domain.RegisterInput) error {
 	if input.Password != input.RePassword {
 		return domain.ErrPasswordsDontMatch
 	}
@@ -110,46 +87,44 @@ func (s *authService) Register(input RegisterInput) error {
 	return nil
 }
 
-func (s *authService) RefreshToken(userId uint, refreshToken string) (Tokens, error) {
-	tokens := Tokens{}
-
+func (s *authService) RefreshToken(userId uint, refreshToken string) (*domain.Tokens, error) {
 	_, err := s.storage.Session.Get(userId, refreshToken)
 	if err != nil {
 		if pkgErrors.Is(err, gorm.ErrRecordNotFound) {
-			return tokens, domain.ErrReshreshTokenNotFound
+			return nil, domain.ErrReshreshTokenNotFound
 		}
-		return tokens, err
+		return nil, err
 	}
 
 	return s.createSession(userId)
 }
 
-func (s *authService) createSession(userId uint) (Tokens, error) {
+func (s *authService) createSession(userId uint) (*domain.Tokens, error) {
 	var (
-		res Tokens
-		err error
+		tokens domain.Tokens
+		err    error
 	)
 
-	res.AccessToken, err = s.tokenManager.NewJWT(userId, s.config.Jwt.AccessTokenTtl)
+	tokens.AccessToken, err = s.tokenManager.NewJWT(userId, s.config.Jwt.AccessTokenTtl)
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 
-	res.RefreshToken, err = s.tokenManager.NewRefreshToken()
+	tokens.RefreshToken, err = s.tokenManager.NewRefreshToken()
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 
 	session := &domain.Session{
 		UserId:       userId,
-		RefreshToken: res.RefreshToken,
+		RefreshToken: tokens.RefreshToken,
 		ExpiresAt:    time.Now().Add(s.config.Jwt.RefreshTokenTtl),
 	}
 
 	err = s.storage.Session.Set(session)
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 
-	return res, nil
+	return &tokens, nil
 }
