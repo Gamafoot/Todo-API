@@ -58,14 +58,14 @@ func (s *projectStorage) FindById(id uint) (*domain.Project, error) {
 	return convertProject(project), nil
 }
 
-func (s *projectStorage) Create(project domain.Project) error {
+func (s *projectStorage) Create(project *domain.Project) error {
 	if err := s.db.Create(project).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
 }
 
-func (s *projectStorage) Update(project domain.Project) error {
+func (s *projectStorage) Update(project *domain.Project) error {
 	if err := s.db.Model(models.Project{}).Where("id = ?", project.Id).Updates(project).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}

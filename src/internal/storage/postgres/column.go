@@ -59,14 +59,14 @@ func (s *columnStorage) FindById(columnId uint) (*domain.Column, error) {
 	return convertColumn(column), nil
 }
 
-func (s *columnStorage) Create(column domain.Column) error {
+func (s *columnStorage) Create(column *domain.Column) error {
 	if err := s.db.Create(column).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
 }
 
-func (s *columnStorage) Update(column domain.Column) error {
+func (s *columnStorage) Update(column *domain.Column) error {
 	if err := s.db.Model(models.Column{}).Where("id = ?", column.Id).Updates(column).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
@@ -104,6 +104,6 @@ func convertColumn(column *models.Column) *domain.Column {
 	return &domain.Column{
 		Id:        column.Id,
 		ProjectId: column.ProjectId,
-		Title:     column.Title,
+		Name:      column.Name,
 	}
 }
