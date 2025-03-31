@@ -1,20 +1,20 @@
 package v1
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"root/internal/domain"
-	"root/internal/service"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
-	pkgErrors "github.com/pkg/errors"
 )
 
 func (h *handler) initTaskRoutes(api *echo.Group) {
 	api.GET("/tasks", h.GetTasks)
-	api.POST("/tasks", h.SaveTask)
-	api.DELETE("/tasks/:taskId", h.Delete)
+	api.POST("/tasks", h.CreateTask)
+	api.PATCH("/tasks/:task_id", h.UpdateTask)
+	api.DELETE("/tasks/:task_id", h.Delete)
 }
 
 func (h *handler) GetTasks(c echo.Context) error {
@@ -40,12 +40,13 @@ func (h *handler) GetTasks(c echo.Context) error {
 		return err
 	}
 
-	tasks, amount, err := h.service.Task.GetChunk(userId, pageInt, limitInt)
+	columnId, err := getUIntFromParam(c, "column_id")
 	if err != nil {
-		if pkgErrors.Is(err, domain.ErrTaskNotFound) {
-			return c.NoContent(http.StatusNotFound)
-		}
+		return err
+	}
 
+	tasks, amount, err := h.service.Task.FindAll(userId, columnId, pageInt, limitInt)
+	if err != nil {
 		return err
 	}
 
@@ -54,17 +55,10 @@ func (h *handler) GetTasks(c echo.Context) error {
 	return c.JSON(http.StatusOK, tasks)
 }
 
-type requestTaskInput struct {
-	Name        string `json:"name" binding:"required,min=1,max=60"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
-	Deadline    string `json:"deadline"`
-}
+func (h *handler) CreateTask(c echo.Context) error {
+	input := new(domain.CreateTaskInput)
 
-func (h *handler) SaveTask(c echo.Context) error {
-	inp := requestTaskInput{}
-
-	if err := c.Bind(&inp); err != nil {
+	if err := c.Bind(input); err != nil {
 		return newResponse(c, http.StatusBadRequest, "invalid request body")
 	}
 
@@ -73,29 +67,19 @@ func (h *handler) SaveTask(c echo.Context) error {
 		return err
 	}
 
-	err = h.service.Task.Save(&service.TaskInput{
-		UserId:      userId,
-		Name:        inp.Name,
-		Description: inp.Description,
-		Status:      inp.Status,
-		Deadline:    inp.Deadline,
-	})
+	task, err := h.service.Task.Create(userId, input)
 	if err != nil {
-		if pkgErrors.Is(err, domain.ErrInvalidDeadlineFormat) {
-			return newResponse(c, http.StatusBadRequest, err.Error())
-		}
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, task)
 }
 
-func (h *handler) Delete(c echo.Context) error {
-	taskId := c.Param("taskId")
+func (h *handler) UpdateTask(c echo.Context) error {
+	input := new(domain.UpdateTaskInput)
 
-	taskIdInt, err := strconv.Atoi(taskId)
-	if err != nil {
-		return newResponse(c, http.StatusBadRequest, "taskId is not digit")
+	if err := c.Bind(input); err != nil {
+		return newResponse(c, http.StatusBadRequest, "invalid request body")
 	}
 
 	userId, err := getUserIdFromContext(c)
@@ -103,10 +87,43 @@ func (h *handler) Delete(c echo.Context) error {
 		return err
 	}
 
-	if err = h.service.Task.Delete(uint(taskIdInt), userId); err != nil {
-		if pkgErrors.Is(err, domain.ErrTaskNotFound) {
-			return c.NoContent(http.StatusNotFound)
+	taskId, err := getUIntFromParam(c, "task_id")
+	if err != nil {
+		return err
+	}
+
+	task, err := h.service.Task.Update(userId, taskId, input)
+	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return newResponse(c, http.StatusForbidden, err.Error())
+		} else if errors.Is(err, domain.ErrRecordNotFound) {
+			return newResponse(c, http.StatusNotFound, err.Error())
 		}
+
+		return err
+	}
+
+	return c.JSON(http.StatusOK, task)
+}
+
+func (h *handler) Delete(c echo.Context) error {
+	taskId, err := getUIntFromParam(c, "task_id")
+	if err != nil {
+		return err
+	}
+
+	userId, err := getUserIdFromContext(c)
+	if err != nil {
+		return err
+	}
+
+	if err = h.service.Task.Delete(userId, taskId); err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return newResponse(c, http.StatusForbidden, err.Error())
+		} else if errors.Is(err, domain.ErrRecordNotFound) {
+			return newResponse(c, http.StatusNotFound, err.Error())
+		}
+
 		return err
 	}
 

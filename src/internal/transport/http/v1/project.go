@@ -10,18 +10,19 @@ import (
 )
 
 func (h *handler) initProjectRoutes(api *echo.Group) {
+	api.POST("/projects", h.FindProjects)
 	api.POST("/projects", h.CreateProject)
-	api.PATCH("/projects", h.UpdateProject)
-	api.DELETE("/projects", h.DeleteProject)
+	api.PATCH("/projects/:project_id", h.UpdateProject)
+	api.DELETE("/projects/:project_id", h.DeleteProject)
 }
 
 func (h *handler) FindProjects(c echo.Context) error {
-	page, err := getIntFromParam(c, "page")
+	page, err := getIntFromQuery(c, "page")
 	if err != nil {
 		return newResponse(c, http.StatusBadRequest, "page is not digit")
 	}
 
-	limit, err := getIntFromParam(c, "limit")
+	limit, err := getIntFromQuery(c, "limit")
 	if err != nil {
 		return newResponse(c, http.StatusBadRequest, "limit is not digit")
 	}
@@ -34,7 +35,7 @@ func (h *handler) FindProjects(c echo.Context) error {
 	columns, amount, err := h.service.Project.FindAll(userId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return newResponse(c, 400, err.Error())
+			return newResponse(c, http.StatusForbidden, err.Error())
 		}
 
 		return err
@@ -45,12 +46,8 @@ func (h *handler) FindProjects(c echo.Context) error {
 	return c.JSON(http.StatusOK, columns)
 }
 
-type CreateProjectInput struct {
-	Name string `json:"username" binding:"required,min=3,max=50"`
-}
-
 func (h *handler) CreateProject(c echo.Context) error {
-	input := new(CreateProjectInput)
+	input := new(domain.CreateProjectInput)
 
 	if err := c.Bind(input); err != nil {
 		return newResponse(c, http.StatusBadRequest, "invalid request body")
@@ -61,21 +58,16 @@ func (h *handler) CreateProject(c echo.Context) error {
 		return err
 	}
 
-	err = h.service.Project.Create(userId, input.Name)
+	project, err := h.service.Project.Create(userId, input)
 	if err != nil {
 		return err
 	}
 
-	return c.NoContent(http.StatusCreated)
-}
-
-type UpdateProjectInput struct {
-	Id   uint   `json:"id" binding:"required"`
-	Name string `json:"username" binding:"required,min=3,max=50"`
+	return c.JSON(http.StatusCreated, project)
 }
 
 func (h *handler) UpdateProject(c echo.Context) error {
-	input := new(UpdateProjectInput)
+	input := new(domain.UpdateProjectInput)
 
 	if err := c.Bind(input); err != nil {
 		return newResponse(c, http.StatusBadRequest, "invalid request body")
@@ -86,42 +78,46 @@ func (h *handler) UpdateProject(c echo.Context) error {
 		return err
 	}
 
-	err = h.service.Project.Update(userId, input.Id, input.Name)
+	projectId, err := getUIntFromParam(c, "project_id")
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotOwnedRecord) || errors.Is(err, domain.ErrRecordNotFound) {
-			return newResponse(c, 400, err.Error())
+		return err
+	}
+
+	project, err := h.service.Project.Update(userId, projectId, input)
+	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return newResponse(c, http.StatusForbidden, err.Error())
+		} else if errors.Is(err, domain.ErrRecordNotFound) {
+			return newResponse(c, http.StatusNotFound, err.Error())
 		}
 
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
-}
-
-type DeleteProjectInput struct {
-	Id uint `json:"id" binding:"required"`
+	return c.JSON(http.StatusOK, project)
 }
 
 func (h *handler) DeleteProject(c echo.Context) error {
-	input := new(DeleteProjectInput)
-
-	if err := c.Bind(input); err != nil {
-		return newResponse(c, http.StatusBadRequest, "invalid request body")
-	}
-
 	userId, err := getUserIdFromContext(c)
 	if err != nil {
 		return err
 	}
 
-	err = h.service.Project.Delete(userId, input.Id)
+	projectId, err := getUIntFromParam(c, "project_id")
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotOwnedRecord) || errors.Is(err, domain.ErrRecordNotFound) {
-			return newResponse(c, 400, err.Error())
+		return err
+	}
+
+	err = h.service.Project.Delete(userId, projectId)
+	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return newResponse(c, http.StatusForbidden, err.Error())
+		} else if errors.Is(err, domain.ErrRecordNotFound) {
+			return newResponse(c, http.StatusNotFound, err.Error())
 		}
 
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }

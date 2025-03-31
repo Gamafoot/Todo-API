@@ -5,31 +5,29 @@ import (
 	"fmt"
 	"net/http"
 	"root/internal/domain"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
-	pkgErrors "github.com/pkg/errors"
 )
 
 func (h *handler) initColumnRoutes(api *echo.Group) {
-	api.GET("/columns", h.CreateColumn)
+	api.GET("/columns", h.FindColumns)
 	api.POST("/columns", h.CreateColumn)
-	api.PATCH("/columns", h.UpdateProject)
-	api.DELETE("/columns", h.DeleteProject)
+	api.PATCH("/columns/:column_id", h.UpdateProject)
+	api.DELETE("/columns/:column_id", h.DeleteProject)
 }
 
 func (h *handler) FindColumns(c echo.Context) error {
-	page, err := getIntFromParam(c, "page")
+	page, err := getIntFromQuery(c, "page")
 	if err != nil {
 		return newResponse(c, http.StatusBadRequest, "page is not digit")
 	}
 
-	limit, err := getIntFromParam(c, "limit")
+	limit, err := getIntFromQuery(c, "limit")
 	if err != nil {
 		return newResponse(c, http.StatusBadRequest, "limit is not digit")
 	}
 
-	projectId, err := getProjectId(c)
+	projectId, err := getUIntFromParam(c, "project_id")
 	if err != nil {
 		return err
 	}
@@ -53,12 +51,8 @@ func (h *handler) FindColumns(c echo.Context) error {
 	return c.JSON(http.StatusOK, columns)
 }
 
-type CreateColumnInput struct {
-	Name string `json:"username" binding:"required,min=3,max=50"`
-}
-
 func (h *handler) CreateColumn(c echo.Context) error {
-	input := new(CreateColumnInput)
+	input := new(domain.CreateColumnInput)
 
 	if err := c.Bind(input); err != nil {
 		return newResponse(c, http.StatusBadRequest, "invalid request body")
@@ -69,12 +63,7 @@ func (h *handler) CreateColumn(c echo.Context) error {
 		return err
 	}
 
-	projectId, err := getProjectId(c)
-	if err != nil {
-		return err
-	}
-
-	err = h.service.Column.Create(userId, projectId, input.Name)
+	column, err := h.service.Column.Create(userId, input)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return newResponse(c, http.StatusBadRequest, err.Error())
@@ -83,16 +72,11 @@ func (h *handler) CreateColumn(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusCreated)
-}
-
-type UpdateColumnInput struct {
-	Id   uint   `json:"id" binding:"required"`
-	Name string `json:"username" binding:"required,min=3,max=50"`
+	return c.JSON(http.StatusCreated, column)
 }
 
 func (h *handler) UpdateColumn(c echo.Context) error {
-	input := new(UpdateProjectInput)
+	input := new(domain.UpdateColumnInput)
 
 	if err := c.Bind(input); err != nil {
 		return newResponse(c, http.StatusBadRequest, "invalid request body")
@@ -103,53 +87,46 @@ func (h *handler) UpdateColumn(c echo.Context) error {
 		return err
 	}
 
-	err = h.service.Project.Update(userId, input.Id, input.Name)
+	projectId, err := getUIntFromParam(c, "project_id")
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotOwnedRecord) || errors.Is(err, domain.ErrRecordNotFound) {
-			return newResponse(c, http.StatusBadRequest, err.Error())
+		return err
+	}
+
+	column, err := h.service.Column.Update(userId, projectId, input)
+	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return newResponse(c, http.StatusForbidden, err.Error())
+		} else if errors.Is(err, domain.ErrRecordNotFound) {
+			return newResponse(c, http.StatusNotFound, err.Error())
 		}
 
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
-}
-
-type DeleteColumnInput struct {
-	Id uint `json:"id" binding:"required"`
+	return c.JSON(http.StatusOK, column)
 }
 
 func (h *handler) DeleteColumn(c echo.Context) error {
-	input := new(DeleteProjectInput)
-
-	if err := c.Bind(input); err != nil {
-		return newResponse(c, http.StatusBadRequest, "invalid request body")
-	}
-
 	userId, err := getUserIdFromContext(c)
 	if err != nil {
 		return err
 	}
 
-	err = h.service.Project.Delete(userId, input.Id)
+	columnId, err := getUIntFromParam(c, "column_id")
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotOwnedRecord) || errors.Is(err, domain.ErrRecordNotFound) {
-			return newResponse(c, http.StatusBadRequest, err.Error())
+		return err
+	}
+
+	err = h.service.Project.Delete(userId, columnId)
+	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return newResponse(c, http.StatusForbidden, err.Error())
+		} else if errors.Is(err, domain.ErrRecordNotFound) {
+			return newResponse(c, http.StatusNotFound, err.Error())
 		}
 
 		return err
 	}
 
 	return c.NoContent(http.StatusOK)
-}
-
-func getProjectId(c echo.Context) (uint, error) {
-	projectId := c.Param("id")
-
-	projectIdInt, err := strconv.Atoi(projectId)
-	if err != nil {
-		return 0, pkgErrors.WithStack(err)
-	}
-
-	return uint(projectIdInt), nil
 }

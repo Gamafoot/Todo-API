@@ -18,7 +18,7 @@ func getUserIdFromContext(c echo.Context) (uint, error) {
 	return userId, nil
 }
 
-func getIntFromParam(c echo.Context, param string) (int, error) {
+func getIntFromQuery(c echo.Context, param string) (int, error) {
 	value := c.QueryParam(param)
 
 	valueInt, err := strconv.Atoi(value)
@@ -27,4 +27,15 @@ func getIntFromParam(c echo.Context, param string) (int, error) {
 	}
 
 	return valueInt, nil
+}
+
+func getUIntFromParam(c echo.Context, param string) (uint, error) {
+	value := c.Param(param)
+
+	valueInt, err := strconv.Atoi(value)
+	if err != nil {
+		return 0, err
+	}
+
+	return uint(valueInt), nil
 }
