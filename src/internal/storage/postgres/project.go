@@ -35,12 +35,12 @@ func (s *projectStorage) FindAll(userId uint, page, limit int) ([]*domain.Projec
 
 func (s *projectStorage) GetAmountPages(userId uint, page, limit int) (int, error) {
 	var (
-		count  int64
-		offset = (page - 1) * limit
-		tasks  = make([]*models.Column, 0)
+		count    int64
+		offset   = (page - 1) * limit
+		projects = make([]*models.Project, 0)
 	)
 
-	if err := s.db.Find(&tasks, "user_id = ?", userId).Offset(offset).Limit(limit).Count(&count).Error; err != nil {
+	if err := s.db.Find(&projects, "user_id = ?", userId).Offset(offset).Limit(limit).Count(&count).Error; err != nil {
 		return 0, pkgErrors.WithStack(err)
 	}
 
@@ -100,7 +100,8 @@ func (s *projectStorage) IsOwnedUser(userId, projectId uint) (bool, error) {
 
 func convertProject(project *models.Project) *domain.Project {
 	return &domain.Project{
-		Id:   project.Id,
-		Name: project.Name,
+		Id:     project.Id,
+		UserId: project.UserId,
+		Name:   project.Name,
 	}
 }
