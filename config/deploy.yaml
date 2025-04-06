@@ -2,7 +2,7 @@ listen:
   port: 8000
 
 database:
-  url: postgres://postgres:pass@postgres:5432/
+  url: postgres://postgres:pass@postgres:5432/todo
 
 hash:
   salt: cy@$N8f2r\g{3@)rj52
