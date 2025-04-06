@@ -2,14 +2,14 @@ listen:
   port: 8000
 
 database:
-  url: postgres://postgres:pass@postgres:5432/todo
+  url: postgres://postgres:pass@postgres:5432/
 
 hash:
   salt: cy@$N8f2r\g{3@)rj52
 
 jwt:
   signing_key: o!5(U0Ixnln~p9?V|ad(^!J#sygxbECrgHg#K<-
-  access_token_ttl: 15m
+  access_token_ttl: 24h
   refresh_token_ttl: 730h
 
 cors:
