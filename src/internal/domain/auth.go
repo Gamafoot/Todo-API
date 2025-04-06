@@ -11,7 +11,7 @@ type Session struct {
 
 type LoginInput struct {
 	Username string `json:"username" binding:"required,min=3,max=25"`
-	Password string `json:"password" binding:"required,min=8,max=64"`
+	Password string `json:"password" binding:"required,min=3,max=64"`
 }
 
 type RegisterInput struct {
