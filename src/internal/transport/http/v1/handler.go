@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"root/internal/config"
 	"root/internal/service"
 	"root/pkg/jwt"
@@ -25,7 +24,6 @@ func NewHandler(cfg *config.Config, service *service.Service, tokenManager jwt.T
 }
 
 func (h *handler) InitRoutes(api *echo.Group) {
-	fmt.Printf("aaa: %v\n", h.config.Cors.AllowOrigins)
 	api.Use(
 		middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins:     h.config.Cors.AllowOrigins,
@@ -36,12 +34,16 @@ func (h *handler) InitRoutes(api *echo.Group) {
 		middleware.Logger(),
 	)
 
-	v1 := api.Group("/v1")
+	h.initSwaggerRoutes(api)
+
+	v1 := api.Group("/api/v1")
 	{
 		h.initAuthRoutes(v1)
 
 		requiredAuth := v1.Group("", h.requiredAuth)
 		{
+			h.initProjectRoutes(requiredAuth)
+			h.initColumnRoutes(requiredAuth)
 			h.initTaskRoutes(requiredAuth)
 		}
 	}

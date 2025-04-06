@@ -26,13 +26,13 @@ func (s sessionStorage) Set(session *domain.Session) error {
 func (s sessionStorage) Get(userId uint, refreshToken string) (domain.Session, error) {
 	session := models.Session{}
 	if err := s.db.First(&session, "user_id = ? AND refresh_token = ?", userId, refreshToken).Error; err != nil {
-		return convert_session(&session), pkgErrors.WithStack(err)
+		return convertSession(&session), pkgErrors.WithStack(err)
 	}
 
-	return convert_session(&session), nil
+	return convertSession(&session), nil
 }
 
-func convert_session(session *models.Session) domain.Session {
+func convertSession(session *models.Session) domain.Session {
 	return domain.Session{
 		Id:           session.Id,
 		UserId:       session.UserId,

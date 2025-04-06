@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"errors"
 	"math"
 	"root/internal/database/models"
 	"root/internal/domain"
@@ -17,30 +18,30 @@ func NewTaskStorage(db *gorm.DB) *taskStorage {
 	return &taskStorage{db: db}
 }
 
-func (s *taskStorage) GetChunk(userId uint, page, limit int) ([]*domain.Task, error) {
+func (s *taskStorage) FindAll(columnId uint, page, limit int) ([]*domain.Task, error) {
 	offset := (page - 1) * limit
 
 	tasks := make([]*models.Task, 0)
-	if err := s.db.Find(&tasks, "user_id = ?", userId).Offset(offset).Limit(limit).Error; err != nil {
+	if err := s.db.Find(&tasks, "column_id = ?", columnId).Offset(offset).Limit(limit).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
 	resultTasks := make([]*domain.Task, len(tasks))
 	for i, task := range tasks {
-		resultTasks[i] = convert_task(task)
+		resultTasks[i] = convertTask(task)
 	}
 
 	return resultTasks, nil
 }
 
-func (s *taskStorage) GetAmountPages(userId uint, page, limit int) (int, error) {
+func (s *taskStorage) GetAmountPages(columnId uint, page, limit int) (int, error) {
 	var (
 		count  int64
 		offset = (page - 1) * limit
-		tasks  = make([]*domain.Task, 0)
+		tasks  = make([]*models.Task, 0)
 	)
 
-	if err := s.db.Find(&tasks, "user_id = ?", userId).Offset(offset).Limit(limit).Count(&count).Error; err != nil {
+	if err := s.db.Find(&tasks, "column_id = ?", columnId).Offset(offset).Limit(limit).Count(&count).Error; err != nil {
 		return 0, pkgErrors.WithStack(err)
 	}
 
@@ -49,25 +50,63 @@ func (s *taskStorage) GetAmountPages(userId uint, page, limit int) (int, error) 
 	return int(amount), nil
 }
 
-func (s *taskStorage) Save(task *domain.Task) error {
-	if err := s.db.Save(task).Error; err != nil {
+func (s *taskStorage) FindById(taskId uint) (*domain.Task, error) {
+	task := new(models.Task)
+	if err := s.db.Find(&task, "id = ?", taskId).Error; err != nil {
+		return nil, pkgErrors.WithStack(err)
+	}
+
+	return convertTask(task), nil
+}
+
+func (s *taskStorage) Create(task *domain.Task) error {
+	if err := s.db.Create(task).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
 }
 
-func (s *taskStorage) Delete(taskId, userId uint) error {
-	if err := s.db.Delete(&domain.Task{}, "id = ? AND user_id = ?", taskId, userId).Error; err != nil {
+func (s *taskStorage) Update(task *domain.Task) error {
+	if err := s.db.Model(models.Task{}).Where("id = ?", task.Id).Updates(task).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
 }
 
-func convert_task(task *models.Task) *domain.Task {
+func (s *taskStorage) Delete(taskId uint) error {
+	if err := s.db.Delete(&domain.Task{Id: taskId}).Error; err != nil {
+		return pkgErrors.WithStack(err)
+	}
+	return nil
+}
+
+func (s *taskStorage) IsOwnedUser(userId, taskId uint) (bool, error) {
+	task := new(models.Task)
+
+	err := s.db.
+		Joins("JOIN columns ON columns.id = tasks.column_id").
+		Joins("JOIN projects ON projects.id = columns.project_id").
+		Joins("JOIN users ON users.id = projects.user_id").
+		Where("tasks.id = ? AND users.id = ?", taskId, userId).
+		First(task).
+		Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return true, nil
+}
+
+func convertTask(task *models.Task) *domain.Task {
 	return &domain.Task{
 		Id:          task.Id,
-		ProjectId:   task.ProjectId,
+		ColumnId:    task.ColumnId,
 		Name:        task.Name,
+		Status:      task.Status,
 		Description: task.Description,
 		Deadline:    task.Deadline,
 		CreatedAt:   task.CreatedAt,

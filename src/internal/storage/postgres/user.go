@@ -22,7 +22,7 @@ func (s *userStorage) GetById(userID uint) (*domain.User, error) {
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	return convert_user(user), nil
+	return convertUser(user), nil
 }
 
 func (s *userStorage) GetByUsername(username string) (*domain.User, error) {
@@ -31,7 +31,7 @@ func (s *userStorage) GetByUsername(username string) (*domain.User, error) {
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	return convert_user(user), nil
+	return convertUser(user), nil
 }
 
 func (s *userStorage) Create(user *domain.User) error {
@@ -48,7 +48,7 @@ func (s *userStorage) Delete(userId uint) error {
 	return nil
 }
 
-func convert_user(user *models.User) *domain.User {
+func convertUser(user *models.User) *domain.User {
 	return &domain.User{
 		Id:        user.Id,
 		Username:  user.Username,

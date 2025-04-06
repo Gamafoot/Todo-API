@@ -1,18 +1,14 @@
 services:
   app:
-    container_name: todo_api
+    container_name: todo-api
     command: bash -c "/app/src/migrate && /app/src/main"
-    image: todo_api
+    image: todo-api
     build:
       context: .
       dockerfile: docker/Dockerfile
     ports:
-    - 0.0.0.0:7000:8000
+      - 0.0.0.0:7000:8000
     environment:
-    - CONFIG_PATH=../config/default.yaml
-    networks:
-      - postgres
-
-networks:
-  postgres:
-    external: true
+      - CONFIG_PATH=../config/deploy.yaml
+    volumes:
+      - ./config:/app/config

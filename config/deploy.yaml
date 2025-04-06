@@ -9,7 +9,7 @@ hash:
 
 jwt:
   signing_key: o!5(U0Ixnln~p9?V|ad(^!J#sygxbECrgHg#K<-
-  access_token_ttl: 15m
+  access_token_ttl: 24h
   refresh_token_ttl: 730h
 
 cors:
