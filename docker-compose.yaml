@@ -12,9 +12,3 @@ services:
       - CONFIG_PATH=../config/deploy.yaml
     volumes:
       - ./config:/app/config
-    networks:
-      - postgres
-
-networks:
-  postgres:
-    external: true
