@@ -14,7 +14,7 @@ import (
 func (h *handler) initAuthRoutes(api *echo.Group) {
 	api.POST("/auth/login", h.Login)
 	api.POST("/auth/register", h.Register)
-	api.GET("/auth/refresh", h.RefreshToken, h.requiredAuth)
+	api.GET("/auth/refresh", h.RefreshToken)
 }
 
 // @Summary Авторизация
@@ -83,7 +83,6 @@ func (h *handler) Register(c echo.Context) error {
 // @Description Обновляет Refresh и Access токены
 // @Tags auth
 // @Produce json
-// @Security BearerAuth
 // @Success 200 {object} tokenResponse
 // @Header 200 {string} Set-Cookie "Устанавливает refresh_token"
 // @Failure 401

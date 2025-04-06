@@ -153,8 +153,6 @@ func (h *handler) DeleteProject(c echo.Context) error {
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)
-		} else if errors.Is(err, domain.ErrRecordNotFound) {
-			return c.NoContent(http.StatusNotFound)
 		}
 
 		return err

@@ -80,12 +80,12 @@ func (s *projectStorage) Delete(id uint) error {
 }
 
 func (s *projectStorage) IsOwnedUser(userId, projectId uint) (bool, error) {
-	column := new(models.Project)
+	project := new(models.Project)
 
 	err := s.db.
 		Joins("JOIN users ON users.id = projects.user_id").
-		Where("users.id = ? AND column.id = ?", userId, projectId).
-		First(column).
+		Where("users.id = ? AND projects.id = ?", userId, projectId).
+		First(project).
 		Error
 
 	if err != nil {

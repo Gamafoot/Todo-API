@@ -74,7 +74,7 @@ func (s *columnStorage) Update(column *domain.Column) error {
 }
 
 func (s *columnStorage) Delete(columnId uint) error {
-	if err := s.db.Delete(&models.Project{Id: columnId}).Error; err != nil {
+	if err := s.db.Delete(&models.Column{Id: columnId}).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
@@ -86,7 +86,7 @@ func (s *columnStorage) IsOwnedUser(userId, columnId uint) (bool, error) {
 	err := s.db.
 		Joins("JOIN projects ON projects.id = columns.project_id").
 		Joins("JOIN users ON users.id = projects.user_id").
-		Where("column.id = ? AND users.id = ?", columnId, userId).
+		Where("columns.id = ? AND users.id = ?", columnId, userId).
 		First(column).
 		Error
 

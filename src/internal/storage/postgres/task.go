@@ -73,22 +73,22 @@ func (s *taskStorage) Update(task *domain.Task) error {
 	return nil
 }
 
-func (s *taskStorage) Delete(taskId, userId uint) error {
-	if err := s.db.Delete(&domain.Task{}, "id = ? AND user_id = ?", taskId, userId).Error; err != nil {
+func (s *taskStorage) Delete(taskId uint) error {
+	if err := s.db.Delete(&domain.Task{Id: taskId}).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
 }
 
-func (s *taskStorage) IsOwnedUser(userId, columnId uint) (bool, error) {
-	column := new(models.Column)
+func (s *taskStorage) IsOwnedUser(userId, taskId uint) (bool, error) {
+	task := new(models.Task)
 
 	err := s.db.
 		Joins("JOIN columns ON columns.id = tasks.column_id").
 		Joins("JOIN projects ON projects.id = columns.project_id").
 		Joins("JOIN users ON users.id = projects.user_id").
-		Where("column.id = ? AND users.id = ?", columnId, userId).
-		First(column).
+		Where("tasks.id = ? AND users.id = ?", taskId, userId).
+		First(task).
 		Error
 
 	if err != nil {
@@ -106,6 +106,7 @@ func convertTask(task *models.Task) *domain.Task {
 		Id:          task.Id,
 		ColumnId:    task.ColumnId,
 		Name:        task.Name,
+		Status:      task.Status,
 		Description: task.Description,
 		Deadline:    task.Deadline,
 		CreatedAt:   task.CreatedAt,

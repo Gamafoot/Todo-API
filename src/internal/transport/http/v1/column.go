@@ -10,10 +10,10 @@ import (
 )
 
 func (h *handler) initColumnRoutes(api *echo.Group) {
-	api.GET("projects/:project_id/columns", h.FindColumns)
+	api.GET("/projects/:project_id/columns", h.FindColumns)
 	api.POST("/columns", h.CreateColumn)
-	api.PATCH("/columns/:column_id", h.UpdateProject)
-	api.DELETE("/columns/:column_id", h.DeleteProject)
+	api.PATCH("/columns/:column_id", h.UpdateColumn)
+	api.DELETE("/columns/:column_id", h.DeleteColumn)
 }
 
 // @Summary Список колонок
@@ -51,7 +51,7 @@ func (h *handler) FindColumns(c echo.Context) error {
 	columns, amount, err := h.service.Column.FindAll(userId, projectId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			return c.NoContent(http.StatusForbidden)
 		}
 
 		return err
@@ -86,7 +86,7 @@ func (h *handler) CreateColumn(c echo.Context) error {
 	column, err := h.service.Column.Create(userId, input)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			return c.NoContent(http.StatusForbidden)
 		}
 
 		return err
@@ -163,8 +163,6 @@ func (h *handler) DeleteColumn(c echo.Context) error {
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)
-		} else if errors.Is(err, domain.ErrRecordNotFound) {
-			return c.NoContent(http.StatusNotFound)
 		}
 
 		return err

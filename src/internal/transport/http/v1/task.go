@@ -11,10 +11,10 @@ import (
 )
 
 func (h *handler) initTaskRoutes(api *echo.Group) {
-	api.GET("/columns/:column_id/tasks", h.GetTasks)
+	api.GET("/columns/:column_id/tasks", h.FindTasks)
 	api.POST("/tasks", h.CreateTask)
 	api.PATCH("/tasks/:task_id", h.UpdateTask)
-	api.DELETE("/tasks/:task_id", h.Delete)
+	api.DELETE("/tasks/:task_id", h.DeleteTask)
 }
 
 // @Summary Список задач
@@ -28,7 +28,7 @@ func (h *handler) initTaskRoutes(api *echo.Group) {
 // @Header 200 {integer} X-Total-Count "Общее количество задач на колонке"
 // @Failure 400
 // @Router /api/v1/columns/{column_id}/tasks [get]
-func (h *handler) GetTasks(c echo.Context) error {
+func (h *handler) FindTasks(c echo.Context) error {
 	page := c.QueryParam("page")
 	limit := c.QueryParam("limit")
 
@@ -106,7 +106,7 @@ func (h *handler) CreateTask(c echo.Context) error {
 // @Failure 400
 // @Failure 403
 // @Failure 404
-// @Router /api/v1/columns/{task_id} [patch]
+// @Router /api/v1/tasks/{task_id} [patch]
 func (h *handler) UpdateTask(c echo.Context) error {
 	input := new(domain.UpdateTaskInput)
 
@@ -141,12 +141,13 @@ func (h *handler) UpdateTask(c echo.Context) error {
 // @Summary Удалить задачу
 // @Tags task
 // @Produce json
+// @Security BearerAuth
 // @Param task_id path int true "ID задачи"
 // @Success 204
 // @Failure 403
 // @Failure 404
 // @Router /api/v1/tasks/{task_id} [delete]
-func (h *handler) Delete(c echo.Context) error {
+func (h *handler) DeleteTask(c echo.Context) error {
 	taskId, err := getUIntFromParam(c, "task_id")
 	if err != nil {
 		return err
@@ -160,12 +161,10 @@ func (h *handler) Delete(c echo.Context) error {
 	if err = h.service.Task.Delete(userId, taskId); err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)
-		} else if errors.Is(err, domain.ErrRecordNotFound) {
-			return c.NoContent(http.StatusNotFound)
 		}
 
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }

@@ -62,11 +62,6 @@ const docTemplate = `{
         },
         "/api/v1/auth/refresh": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Обновляет Refresh и Access токены",
                 "produces": [
                     "application/json"
@@ -312,60 +307,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
-                    }
-                }
-            }
-        },
-        "/api/v1/columns/{task_id}": {
-            "patch": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "task"
-                ],
-                "summary": "Обновить задачу",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID задачи",
-                        "name": "task_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Данные для обновления задачи",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/domain.UpdateTaskInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Обновленная задача",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Column"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
                     }
                 }
             }
@@ -650,6 +591,11 @@ const docTemplate = `{
         },
         "/api/v1/tasks/{task_id}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -669,6 +615,58 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "task"
+                ],
+                "summary": "Обновить задачу",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID задачи",
+                        "name": "task_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные для обновления задачи",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UpdateTaskInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Обновленная задача",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Column"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -731,12 +729,14 @@ const docTemplate = `{
                 "column_id",
                 "description",
                 "name",
-                "status",
-                "timestamp"
+                "status"
             ],
             "properties": {
                 "column_id": {
                     "type": "integer"
+                },
+                "deadline": {
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -748,9 +748,6 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "boolean"
-                },
-                "timestamp": {
-                    "type": "string"
                 }
             }
         },

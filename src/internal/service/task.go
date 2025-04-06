@@ -5,9 +5,7 @@ import (
 	"root/internal/config"
 	"root/internal/domain"
 	"root/internal/storage"
-	"time"
 
-	pkgErrors "github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
@@ -71,14 +69,12 @@ func (s *taskService) Create(userId uint, input *domain.CreateTaskInput) (*domai
 		return nil, domain.ErrUserNotOwnedRecord
 	}
 
-	var deadline *time.Time
-
 	task := &domain.Task{
 		ColumnId:    input.ColumnId,
 		Name:        input.Name,
 		Description: input.Description,
 		Status:      input.Status,
-		Deadline:    deadline,
+		Deadline:    input.Deadline,
 	}
 
 	err = s.storage.Task.Create(task)
@@ -126,14 +122,15 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 	return task, nil
 }
 
-func (s *taskService) Delete(taskId, userId uint) error {
-	if err := s.storage.Task.Delete(taskId, userId); err != nil {
-		if pkgErrors.Is(err, gorm.ErrRecordNotFound) {
-			return domain.ErrRecordNotFound
-		}
-
+func (s *taskService) Delete(userId, taskId uint) error {
+	ok, err := s.storage.Task.IsOwnedUser(userId, taskId)
+	if err != nil {
 		return err
 	}
 
-	return nil
+	if !ok {
+		return domain.ErrUserNotOwnedRecord
+	}
+
+	return s.storage.Task.Delete(taskId)
 }

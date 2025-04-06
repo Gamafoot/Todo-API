@@ -33,6 +33,8 @@ definitions:
     properties:
       column_id:
         type: integer
+      deadline:
+        type: string
       description:
         type: string
       name:
@@ -41,14 +43,11 @@ definitions:
         type: string
       status:
         type: boolean
-      timestamp:
-        type: string
     required:
     - column_id
     - description
     - name
     - status
-    - timestamp
     type: object
   domain.LoginInput:
     properties:
@@ -198,8 +197,6 @@ paths:
             $ref: '#/definitions/v1.tokenResponse'
         "401":
           description: Unauthorized
-      security:
-      - BearerAuth: []
       summary: Обновить токены
       tags:
       - auth
@@ -340,40 +337,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Список задач
-      tags:
-      - task
-  /api/v1/columns/{task_id}:
-    patch:
-      consumes:
-      - application/json
-      parameters:
-      - description: ID задачи
-        in: path
-        name: task_id
-        required: true
-        type: integer
-      - description: Данные для обновления задачи
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/domain.UpdateTaskInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Обновленная задача
-          schema:
-            $ref: '#/definitions/domain.Column'
-        "400":
-          description: Bad Request
-        "403":
-          description: Forbidden
-        "404":
-          description: Not Found
-      security:
-      - BearerAuth: []
-      summary: Обновить задачу
       tags:
       - task
   /api/v1/projects:
@@ -566,7 +529,42 @@ paths:
           description: Forbidden
         "404":
           description: Not Found
+      security:
+      - BearerAuth: []
       summary: Удалить задачу
+      tags:
+      - task
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID задачи
+        in: path
+        name: task_id
+        required: true
+        type: integer
+      - description: Данные для обновления задачи
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateTaskInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновленная задача
+          schema:
+            $ref: '#/definitions/domain.Column'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      security:
+      - BearerAuth: []
+      summary: Обновить задачу
       tags:
       - task
 securityDefinitions:
