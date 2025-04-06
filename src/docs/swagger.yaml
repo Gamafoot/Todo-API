@@ -1,0 +1,585 @@
+basePath: /api/v1
+definitions:
+  domain.Column:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      projectId:
+        type: integer
+    type: object
+  domain.CreateColumnInput:
+    properties:
+      name:
+        maxLength: 50
+        minLength: 3
+        type: string
+      project_id:
+        type: integer
+    required:
+    - name
+    - project_id
+    type: object
+  domain.CreateProjectInput:
+    properties:
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - username
+    type: object
+  domain.CreateTaskInput:
+    properties:
+      column_id:
+        type: integer
+      description:
+        type: string
+      name:
+        maxLength: 50
+        minLength: 3
+        type: string
+      status:
+        type: boolean
+      timestamp:
+        type: string
+    required:
+    - column_id
+    - description
+    - name
+    - status
+    - timestamp
+    type: object
+  domain.LoginInput:
+    properties:
+      password:
+        maxLength: 64
+        minLength: 8
+        type: string
+      username:
+        maxLength: 25
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  domain.Project:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      userId:
+        type: integer
+    type: object
+  domain.RegisterInput:
+    properties:
+      password:
+        maxLength: 64
+        minLength: 8
+        type: string
+      re_password:
+        maxLength: 64
+        minLength: 8
+        type: string
+      username:
+        maxLength: 25
+        minLength: 3
+        type: string
+    required:
+    - password
+    - re_password
+    - username
+    type: object
+  domain.Task:
+    properties:
+      columnId:
+        type: integer
+      createdAt:
+        type: string
+      deadline:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: boolean
+      updatedAt:
+        type: string
+    type: object
+  domain.UpdateColumnInput:
+    properties:
+      name:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - name
+    type: object
+  domain.UpdateProjectInput:
+    properties:
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - username
+    type: object
+  domain.UpdateTaskInput:
+    properties:
+      deadline:
+        type: string
+      description:
+        type: string
+      name:
+        maxLength: 50
+        minLength: 3
+        type: string
+      status:
+        type: boolean
+    type: object
+  v1.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  v1.tokenResponse:
+    properties:
+      access_token:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: API для управления задачами
+  title: Todo API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные для авторизации
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              description: Устанавливает refresh_token
+              type: string
+          schema:
+            $ref: '#/definitions/v1.tokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+        "401":
+          description: Unauthorized
+      summary: Авторизация
+      tags:
+      - auth
+  /auth/refresh:
+    get:
+      description: Обновляет Refresh и Access токены
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              description: Устанавливает refresh_token
+              type: string
+          schema:
+            $ref: '#/definitions/v1.tokenResponse'
+        "401":
+          description: Unauthorized
+      summary: Обновить токены
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные для регистрации
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+      summary: Регистрация
+      tags:
+      - auth
+  /columns:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные для создания колонки
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateColumnInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Column'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+      summary: Создать колонку
+      tags:
+      - column
+  /columns/{column_id}:
+    delete:
+      parameters:
+      - description: ID колонки
+        in: path
+        name: column_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      summary: Удалить колонку
+      tags:
+      - column
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID колонки
+        in: path
+        name: column_id
+        required: true
+        type: integer
+      - description: Данные для обновления колонки
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateColumnInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Column'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      summary: Обновить колонку
+      tags:
+      - column
+  /columns/{column_id}/tasks:
+    get:
+      parameters:
+      - description: ID колонки
+        in: path
+        name: column_id
+        required: true
+        type: integer
+      - description: Номер страницы, по уполчанию 1
+        in: query
+        name: page
+        type: integer
+      - description: Кол-во итоговых записей, по уполчанию 10
+        in: path
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Total-Count:
+              description: Общее количество задач на колонке
+              type: integer
+          schema:
+            items:
+              $ref: '#/definitions/domain.Task'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+      summary: Список задач
+      tags:
+      - task
+  /columns/{task_id}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID задачи
+        in: path
+        name: task_id
+        required: true
+        type: integer
+      - description: Данные для обновления задачи
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateTaskInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновленная задача
+          schema:
+            $ref: '#/definitions/domain.Column'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      summary: Обновить задачу
+      tags:
+      - task
+  /projects:
+    get:
+      parameters:
+      - description: Номер страницы, по уполчанию 1
+        in: query
+        name: page
+        type: integer
+      - description: Кол-во итоговых записей, по уполчанию 10
+        in: path
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Total-Count:
+              description: Общее количество проектов у пользователя
+              type: integer
+          schema:
+            items:
+              $ref: '#/definitions/domain.Project'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+      summary: Список проектов
+      tags:
+      - project
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные для создания проекта
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateProjectInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Project'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+      summary: Создать проект
+      tags:
+      - project
+  /projects/{project_id}:
+    delete:
+      parameters:
+      - description: ID проекта
+        in: path
+        name: project_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      summary: Удалить проект
+      tags:
+      - project
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID проекта
+        in: path
+        name: project_id
+        required: true
+        type: integer
+      - description: Данные для обновления проекта
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateProjectInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Project'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      summary: Обновить колонку
+      tags:
+      - project
+  /projects/{project_id}/columns:
+    get:
+      parameters:
+      - description: ID проекта
+        in: path
+        name: project_id
+        required: true
+        type: integer
+      - description: Номер страницы, по уполчанию 1
+        in: query
+        name: page
+        type: integer
+      - description: Кол-во итоговых записей, по уполчанию 10
+        in: path
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Total-Count:
+              description: Общее количество колонок на проекте
+              type: integer
+          schema:
+            items:
+              $ref: '#/definitions/domain.Column'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+      summary: Список колонок
+      tags:
+      - column
+  /tasks:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные для создания задачи
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateTaskInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Созданная задача
+          schema:
+            $ref: '#/definitions/domain.Task'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+      summary: Создать задачу
+      tags:
+      - task
+  /tasks/{task_id}:
+    delete:
+      parameters:
+      - description: ID задачи
+        in: path
+        name: task_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.ErrorResponse'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      summary: Удалить задачу
+      tags:
+      - task
+swagger: "2.0"

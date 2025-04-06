@@ -16,15 +16,24 @@ func (h *handler) initProjectRoutes(api *echo.Group) {
 	api.DELETE("/projects/:project_id", h.DeleteProject)
 }
 
+// @Summary Список проектов
+// @Tags project
+// @Produce json
+// @Param page query int false "Номер страницы, по уполчанию 1"
+// @Param limit path int false "Кол-во итоговых записей, по уполчанию 10"
+// @Success 200 {array} domain.Project
+// @Header 200 {integer} X-Total-Count "Общее количество проектов у пользователя"
+// @Failure 400
+// @Router /projects [get]
 func (h *handler) FindProjects(c echo.Context) error {
 	page, err := getIntFromQuery(c, "page")
 	if err != nil {
-		return newResponse(c, http.StatusBadRequest, "page is not digit")
+		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	limit, err := getIntFromQuery(c, "limit")
 	if err != nil {
-		return newResponse(c, http.StatusBadRequest, "limit is not digit")
+		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	userId, err := getUserIdFromContext(c)
@@ -35,7 +44,7 @@ func (h *handler) FindProjects(c echo.Context) error {
 	columns, amount, err := h.service.Project.FindAll(userId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return newResponse(c, http.StatusForbidden, err.Error())
+			return c.NoContent(http.StatusForbidden)
 		}
 
 		return err
@@ -46,11 +55,19 @@ func (h *handler) FindProjects(c echo.Context) error {
 	return c.JSON(http.StatusOK, columns)
 }
 
+// @Summary Создать проект
+// @Tags project
+// @Accept json
+// @Produce json
+// @Param body body domain.CreateProjectInput true "Данные для создания проекта"
+// @Success 200 {object} domain.Project
+// @Failure 400
+// @Router /projects [post]
 func (h *handler) CreateProject(c echo.Context) error {
 	input := new(domain.CreateProjectInput)
 
 	if err := c.Bind(input); err != nil {
-		return newResponse(c, http.StatusBadRequest, "invalid request body")
+		return c.NoContent(http.StatusBadRequest)
 	}
 
 	userId, err := getUserIdFromContext(c)
@@ -66,11 +83,22 @@ func (h *handler) CreateProject(c echo.Context) error {
 	return c.JSON(http.StatusCreated, project)
 }
 
+// @Summary Обновить колонку
+// @Tags project
+// @Accept json
+// @Produce json
+// @Param project_id path int true "ID проекта"
+// @Param body body domain.UpdateProjectInput true "Данные для обновления проекта"
+// @Success 200 {object} domain.Project
+// @Failure 400
+// @Failure 403
+// @Failure 404
+// @Router /projects/{project_id} [patch]
 func (h *handler) UpdateProject(c echo.Context) error {
 	input := new(domain.UpdateProjectInput)
 
 	if err := c.Bind(input); err != nil {
-		return newResponse(c, http.StatusBadRequest, "invalid request body")
+		return c.NoContent(http.StatusBadRequest)
 	}
 
 	userId, err := getUserIdFromContext(c)
@@ -86,9 +114,9 @@ func (h *handler) UpdateProject(c echo.Context) error {
 	project, err := h.service.Project.Update(userId, projectId, input)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return newResponse(c, http.StatusForbidden, err.Error())
+			return c.NoContent(http.StatusForbidden)
 		} else if errors.Is(err, domain.ErrRecordNotFound) {
-			return newResponse(c, http.StatusNotFound, err.Error())
+			return c.NoContent(http.StatusNotFound)
 		}
 
 		return err
@@ -97,6 +125,15 @@ func (h *handler) UpdateProject(c echo.Context) error {
 	return c.JSON(http.StatusOK, project)
 }
 
+// @Summary Удалить проект
+// @Tags project
+// @Produce json
+// @Param project_id path int true "ID проекта"
+// @Success 204
+// @Failure 400
+// @Failure 403
+// @Failure 404
+// @Router /projects/{project_id} [delete]
 func (h *handler) DeleteProject(c echo.Context) error {
 	userId, err := getUserIdFromContext(c)
 	if err != nil {
@@ -111,9 +148,9 @@ func (h *handler) DeleteProject(c echo.Context) error {
 	err = h.service.Project.Delete(userId, projectId)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return newResponse(c, http.StatusForbidden, err.Error())
+			return c.NoContent(http.StatusForbidden)
 		} else if errors.Is(err, domain.ErrRecordNotFound) {
-			return newResponse(c, http.StatusNotFound, err.Error())
+			return c.NoContent(http.StatusNotFound)
 		}
 
 		return err

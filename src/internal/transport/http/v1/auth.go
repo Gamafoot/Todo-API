@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"root/internal/domain"
 	customErrors "root/pkg/errors"
@@ -16,11 +17,22 @@ func (h *handler) initAuthRoutes(api *echo.Group) {
 	api.GET("/auth/refresh", h.RefreshToken, h.requiredAuth)
 }
 
+// @Summary Авторизация
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param body body domain.LoginInput true "Данные для авторизации"
+// @Success 200 {object} tokenResponse
+// @Header 200 {string} Set-Cookie "Устанавливает refresh_token"
+// @Failure 400
+// @Failure 401
+// @Router /auth/login [post]
 func (h *handler) Login(c echo.Context) error {
 	input := new(domain.LoginInput)
 
 	if err := c.Bind(input); err != nil {
-		return newResponse(c, http.StatusBadRequest, "invalid request body")
+		fmt.Printf("r: %s\n", err)
+		return c.NoContent(http.StatusBadRequest)
 	}
 
 	tokens, err := h.service.Auth.Login(&domain.LoginInput{
@@ -29,7 +41,7 @@ func (h *handler) Login(c echo.Context) error {
 	})
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidLoginOrPassword) {
-			return newResponse(c, http.StatusUnauthorized, err.Error())
+			return c.NoContent(http.StatusUnauthorized)
 		}
 		return err
 	}
@@ -37,11 +49,19 @@ func (h *handler) Login(c echo.Context) error {
 	return setTokensToResponse(c, tokens, h.config.Jwt.RefreshTokenTtl)
 }
 
+// @Summary Регистрация
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param body body domain.RegisterInput true "Данные для регистрации"
+// @Success 201
+// @Failure 400
+// @Router /auth/register [post]
 func (h *handler) Register(c echo.Context) error {
 	input := new(domain.RegisterInput)
 
 	if err := c.Bind(input); err != nil {
-		return newResponse(c, http.StatusBadRequest, "invalid request body")
+		return c.NoContent(http.StatusBadRequest)
 	}
 
 	err := h.service.Auth.Register(&domain.RegisterInput{
@@ -51,7 +71,7 @@ func (h *handler) Register(c echo.Context) error {
 	})
 	if err != nil {
 		if customErrors.MatchIn(err, domain.ErrPasswordsDontMatch, domain.ErrUsernameIsOccupied) {
-			return newResponse(c, http.StatusBadRequest, err.Error())
+			return NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		}
 		return err
 	}
@@ -59,10 +79,18 @@ func (h *handler) Register(c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
+// @Summary Обновить токены
+// @Description Обновляет Refresh и Access токены
+// @Tags auth
+// @Produce json
+// @Success 200 {object} tokenResponse
+// @Header 200 {string} Set-Cookie "Устанавливает refresh_token"
+// @Failure 401
+// @Router /auth/refresh [get]
 func (h *handler) RefreshToken(c echo.Context) error {
 	cookie, err := c.Cookie("refresh_token")
 	if err != nil {
-		return c.NoContent(http.StatusForbidden)
+		return c.NoContent(http.StatusUnauthorized)
 	}
 
 	userId, err := getUserIdFromContext(c)
@@ -73,7 +101,7 @@ func (h *handler) RefreshToken(c echo.Context) error {
 	tokens, err := h.service.Auth.RefreshToken(userId, cookie.Value)
 	if err != nil {
 		if errors.Is(err, domain.ErrReshreshTokenNotFound) {
-			return c.NoContent(http.StatusForbidden)
+			return c.NoContent(http.StatusUnauthorized)
 		}
 
 		return err
@@ -82,8 +110,8 @@ func (h *handler) RefreshToken(c echo.Context) error {
 	return setTokensToResponse(c, tokens, h.config.Jwt.RefreshTokenTtl)
 }
 
-type refreshTokenResponse struct {
-	AccessToken string
+type tokenResponse struct {
+	AccessToken string `json:"access_token"`
 }
 
 func setTokensToResponse(c echo.Context, tokens *domain.Tokens, refreshTokenTtl time.Duration) error {
@@ -98,7 +126,7 @@ func setTokensToResponse(c echo.Context, tokens *domain.Tokens, refreshTokenTtl 
 		MaxAge:   refreshTokenMaxAge,
 	})
 
-	return c.JSON(http.StatusOK, refreshTokenResponse{
+	return c.JSON(http.StatusOK, tokenResponse{
 		AccessToken: tokens.AccessToken,
 	})
 }
