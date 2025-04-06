@@ -5,7 +5,8 @@ import (
 )
 
 var (
-	ErrRequestBody            = pkgErrors.New("invalid request body")
+	ErrNotDigit               = pkgErrors.New("not digit")
+	ErrNotPositiveDigit       = pkgErrors.New("digit must be positive")
 	ErrUsernameIsOccupied     = pkgErrors.New("username is occupied")
 	ErrInvalidLoginOrPassword = pkgErrors.New("invalid login or password")
 	ErrPasswordsDontMatch     = pkgErrors.New("passwords don't match")
