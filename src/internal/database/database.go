@@ -23,8 +23,10 @@ func NewConnect(dbURL string) (*gorm.DB, error) {
 func CreateAllTables(db *gorm.DB) error {
 	tables := []interface{}{
 		models.User{},
-		models.Task{},
 		models.Session{},
+		models.Project{},
+		models.Column{},
+		models.Task{},
 	}
 
 	if err := db.AutoMigrate(tables...); err != nil {
