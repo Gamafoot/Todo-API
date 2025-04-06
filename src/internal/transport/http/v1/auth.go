@@ -26,7 +26,7 @@ func (h *handler) initAuthRoutes(api *echo.Group) {
 // @Header 200 {string} Set-Cookie "Устанавливает refresh_token"
 // @Failure 400
 // @Failure 401
-// @Router /auth/login [post]
+// @Router /api/v1/auth/login [post]
 func (h *handler) Login(c echo.Context) error {
 	input := new(domain.LoginInput)
 
@@ -56,7 +56,7 @@ func (h *handler) Login(c echo.Context) error {
 // @Param body body domain.RegisterInput true "Данные для регистрации"
 // @Success 201
 // @Failure 400
-// @Router /auth/register [post]
+// @Router /api/v1/auth/register [post]
 func (h *handler) Register(c echo.Context) error {
 	input := new(domain.RegisterInput)
 
@@ -83,10 +83,11 @@ func (h *handler) Register(c echo.Context) error {
 // @Description Обновляет Refresh и Access токены
 // @Tags auth
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {object} tokenResponse
 // @Header 200 {string} Set-Cookie "Устанавливает refresh_token"
 // @Failure 401
-// @Router /auth/refresh [get]
+// @Router /api/v1/auth/refresh [get]
 func (h *handler) RefreshToken(c echo.Context) error {
 	cookie, err := c.Cookie("refresh_token")
 	if err != nil {
@@ -121,7 +122,7 @@ func setTokensToResponse(c echo.Context, tokens *domain.Tokens, refreshTokenTtl 
 		Name:     "refresh_token",
 		Value:    tokens.RefreshToken,
 		Path:     "/",
-		HttpOnly: true,
+		HttpOnly: false,
 		SameSite: http.SameSiteDefaultMode,
 		MaxAge:   refreshTokenMaxAge,
 	})

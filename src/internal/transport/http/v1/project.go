@@ -10,7 +10,7 @@ import (
 )
 
 func (h *handler) initProjectRoutes(api *echo.Group) {
-	api.POST("/projects", h.FindProjects)
+	api.GET("/projects", h.FindProjects)
 	api.POST("/projects", h.CreateProject)
 	api.PATCH("/projects/:project_id", h.UpdateProject)
 	api.DELETE("/projects/:project_id", h.DeleteProject)
@@ -19,12 +19,13 @@ func (h *handler) initProjectRoutes(api *echo.Group) {
 // @Summary Список проектов
 // @Tags project
 // @Produce json
+// @Security BearerAuth
 // @Param page query int false "Номер страницы, по уполчанию 1"
-// @Param limit path int false "Кол-во итоговых записей, по уполчанию 10"
+// @Param limit query int false "Кол-во итоговых записей, по уполчанию 10"
 // @Success 200 {array} domain.Project
 // @Header 200 {integer} X-Total-Count "Общее количество проектов у пользователя"
 // @Failure 400
-// @Router /projects [get]
+// @Router /api/v1/projects [get]
 func (h *handler) FindProjects(c echo.Context) error {
 	page, err := getIntFromQuery(c, "page")
 	if err != nil {
@@ -59,10 +60,11 @@ func (h *handler) FindProjects(c echo.Context) error {
 // @Tags project
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param body body domain.CreateProjectInput true "Данные для создания проекта"
 // @Success 200 {object} domain.Project
 // @Failure 400
-// @Router /projects [post]
+// @Router /api/v1/projects [post]
 func (h *handler) CreateProject(c echo.Context) error {
 	input := new(domain.CreateProjectInput)
 
@@ -87,13 +89,14 @@ func (h *handler) CreateProject(c echo.Context) error {
 // @Tags project
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param project_id path int true "ID проекта"
 // @Param body body domain.UpdateProjectInput true "Данные для обновления проекта"
 // @Success 200 {object} domain.Project
 // @Failure 400
 // @Failure 403
 // @Failure 404
-// @Router /projects/{project_id} [patch]
+// @Router /api/v1/projects/{project_id} [patch]
 func (h *handler) UpdateProject(c echo.Context) error {
 	input := new(domain.UpdateProjectInput)
 
@@ -128,12 +131,13 @@ func (h *handler) UpdateProject(c echo.Context) error {
 // @Summary Удалить проект
 // @Tags project
 // @Produce json
+// @Security BearerAuth
 // @Param project_id path int true "ID проекта"
 // @Success 204
 // @Failure 400
 // @Failure 403
 // @Failure 404
-// @Router /projects/{project_id} [delete]
+// @Router /api/v1/projects/{project_id} [delete]
 func (h *handler) DeleteProject(c echo.Context) error {
 	userId, err := getUserIdFromContext(c)
 	if err != nil {

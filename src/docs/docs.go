@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/login": {
+        "/api/v1/auth/login": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -52,10 +52,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -63,8 +60,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/refresh": {
+        "/api/v1/auth/refresh": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Обновляет Refresh и Access токены",
                 "produces": [
                     "application/json"
@@ -92,7 +94,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/register": {
+        "/api/v1/auth/register": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -120,16 +122,18 @@ const docTemplate = `{
                         "description": "Created"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     }
                 }
             }
         },
-        "/columns": {
+        "/api/v1/columns": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -159,16 +163,18 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     }
                 }
             }
         },
-        "/columns/{column_id}": {
+        "/api/v1/columns/{column_id}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -190,10 +196,7 @@ const docTemplate = `{
                         "description": "No Content"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -204,6 +207,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -240,10 +248,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -254,8 +259,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/columns/{column_id}/tasks": {
+        "/api/v1/columns/{column_id}/tasks": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -281,7 +291,7 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Кол-во итоговых записей, по уполчанию 10",
                         "name": "limit",
-                        "in": "path"
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -301,16 +311,18 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     }
                 }
             }
         },
-        "/columns/{task_id}": {
+        "/api/v1/columns/{task_id}": {
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -347,10 +359,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -361,8 +370,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/projects": {
+        "/api/v1/projects": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -381,7 +395,7 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Кол-во итоговых записей, по уполчанию 10",
                         "name": "limit",
-                        "in": "path"
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -401,14 +415,16 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     }
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -438,16 +454,18 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     }
                 }
             }
         },
-        "/projects/{project_id}": {
+        "/api/v1/projects/{project_id}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -469,10 +487,7 @@ const docTemplate = `{
                         "description": "No Content"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -483,6 +498,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -519,10 +539,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -533,8 +550,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/projects/{project_id}/columns": {
+        "/api/v1/projects/{project_id}/columns": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -560,7 +582,7 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Кол-во итоговых записей, по уполчанию 10",
                         "name": "limit",
-                        "in": "path"
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -580,16 +602,18 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     }
                 }
             }
         },
-        "/tasks": {
+        "/api/v1/tasks": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -619,15 +643,12 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
+                        "description": "Bad Request"
                     }
                 }
             }
         },
-        "/tasks/{task_id}": {
+        "/api/v1/tasks/{task_id}": {
             "delete": {
                 "produces": [
                     "application/json"
@@ -648,12 +669,6 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
-                        }
                     },
                     "403": {
                         "description": "Forbidden"
@@ -749,7 +764,7 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "maxLength": 64,
-                    "minLength": 8
+                    "minLength": 3
                 },
                 "username": {
                     "type": "string",
@@ -871,14 +886,6 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
         "v1.tokenResponse": {
             "type": "object",
             "properties": {
@@ -887,14 +894,21 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8000",
-	BasePath:         "/api/v1",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Todo API",
 	Description:      "API для управления задачами",

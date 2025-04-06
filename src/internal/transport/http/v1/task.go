@@ -20,13 +20,14 @@ func (h *handler) initTaskRoutes(api *echo.Group) {
 // @Summary Список задач
 // @Tags task
 // @Produce json
+// @Security BearerAuth
 // @Param column_id path int true "ID колонки"
 // @Param page query int false "Номер страницы, по уполчанию 1"
-// @Param limit path int false "Кол-во итоговых записей, по уполчанию 10"
+// @Param limit query int false "Кол-во итоговых записей, по уполчанию 10"
 // @Success 200 {array} domain.Task
 // @Header 200 {integer} X-Total-Count "Общее количество задач на колонке"
 // @Failure 400
-// @Router /columns/{column_id}/tasks [get]
+// @Router /api/v1/columns/{column_id}/tasks [get]
 func (h *handler) GetTasks(c echo.Context) error {
 	page := c.QueryParam("page")
 	limit := c.QueryParam("limit")
@@ -69,10 +70,11 @@ func (h *handler) GetTasks(c echo.Context) error {
 // @Tags task
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param body body domain.CreateTaskInput true "Данные для создания задачи"
 // @Success 200 {object} domain.Task "Созданная задача"
 // @Failure 400
-// @Router /tasks [post]
+// @Router /api/v1/tasks [post]
 func (h *handler) CreateTask(c echo.Context) error {
 	input := new(domain.CreateTaskInput)
 
@@ -97,13 +99,14 @@ func (h *handler) CreateTask(c echo.Context) error {
 // @Tags task
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param task_id path int true "ID задачи"
 // @Param body body domain.UpdateTaskInput true "Данные для обновления задачи"
 // @Success 200 {object} domain.Column "Обновленная задача"
 // @Failure 400
 // @Failure 403
 // @Failure 404
-// @Router /columns/{task_id} [patch]
+// @Router /api/v1/columns/{task_id} [patch]
 func (h *handler) UpdateTask(c echo.Context) error {
 	input := new(domain.UpdateTaskInput)
 
@@ -142,7 +145,7 @@ func (h *handler) UpdateTask(c echo.Context) error {
 // @Success 204
 // @Failure 403
 // @Failure 404
-// @Router /tasks/{task_id} [delete]
+// @Router /api/v1/tasks/{task_id} [delete]
 func (h *handler) Delete(c echo.Context) error {
 	taskId, err := getUIntFromParam(c, "task_id")
 	if err != nil {

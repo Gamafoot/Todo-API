@@ -42,9 +42,9 @@ func (h *handler) InitRoutes(api *echo.Group) {
 
 		requiredAuth := v1.Group("", h.requiredAuth)
 		{
-			h.initTaskRoutes(requiredAuth)
 			h.initProjectRoutes(requiredAuth)
 			h.initColumnRoutes(requiredAuth)
+			h.initTaskRoutes(requiredAuth)
 		}
 	}
 }

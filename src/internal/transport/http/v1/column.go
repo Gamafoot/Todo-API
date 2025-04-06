@@ -19,13 +19,14 @@ func (h *handler) initColumnRoutes(api *echo.Group) {
 // @Summary Список колонок
 // @Tags column
 // @Produce json
+// @Security BearerAuth
 // @Param project_id path int true "ID проекта"
 // @Param page query int false "Номер страницы, по уполчанию 1"
-// @Param limit path int false "Кол-во итоговых записей, по уполчанию 10"
+// @Param limit query int false "Кол-во итоговых записей, по уполчанию 10"
 // @Success 200 {array} domain.Column
 // @Header 200 {integer} X-Total-Count "Общее количество колонок на проекте"
 // @Failure 400
-// @Router /projects/{project_id}/columns [get]
+// @Router /api/v1/projects/{project_id}/columns [get]
 func (h *handler) FindColumns(c echo.Context) error {
 	page, err := getIntFromQuery(c, "page", 1)
 	if err != nil {
@@ -65,10 +66,11 @@ func (h *handler) FindColumns(c echo.Context) error {
 // @Tags column
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param body body domain.CreateColumnInput true "Данные для создания колонки"
 // @Success 200 {object} domain.Column
 // @Failure 400
-// @Router /columns [post]
+// @Router /api/v1/columns [post]
 func (h *handler) CreateColumn(c echo.Context) error {
 	input := new(domain.CreateColumnInput)
 
@@ -97,13 +99,14 @@ func (h *handler) CreateColumn(c echo.Context) error {
 // @Tags column
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param column_id path int true "ID колонки"
 // @Param body body domain.UpdateColumnInput true "Данные для обновления колонки"
 // @Success 200 {object} domain.Column
 // @Failure 400
 // @Failure 403
 // @Failure 404
-// @Router /columns/{column_id} [patch]
+// @Router /api/v1/columns/{column_id} [patch]
 func (h *handler) UpdateColumn(c echo.Context) error {
 	input := new(domain.UpdateColumnInput)
 
@@ -138,12 +141,13 @@ func (h *handler) UpdateColumn(c echo.Context) error {
 // @Summary Удалить колонку
 // @Tags column
 // @Produce json
+// @Security BearerAuth
 // @Param column_id path int true "ID колонки"
 // @Success 204
 // @Failure 400
 // @Failure 403
 // @Failure 404
-// @Router /columns/{column_id} [delete]
+// @Router /api/v1/columns/{column_id} [delete]
 func (h *handler) DeleteColumn(c echo.Context) error {
 	userId, err := getUserIdFromContext(c)
 	if err != nil {
