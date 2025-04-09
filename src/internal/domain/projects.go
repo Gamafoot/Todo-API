@@ -11,5 +11,5 @@ type CreateProjectInput struct {
 }
 
 type UpdateProjectInput struct {
-	Name string `json:"username" binding:"required,min=3,max=50"`
+	Name string `json:"name" binding:"required,min=3,max=50"`
 }
