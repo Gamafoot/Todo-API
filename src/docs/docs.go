@@ -53,9 +53,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
                     }
                 }
             }
@@ -159,6 +156,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 }
             }
@@ -192,6 +192,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -244,6 +247,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -307,6 +313,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 }
             }
@@ -357,6 +366,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 }
             },
@@ -396,6 +408,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 }
             }
@@ -430,6 +445,9 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request"
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
                     "403": {
                         "description": "Forbidden"
                     },
@@ -453,7 +471,7 @@ const docTemplate = `{
                 "tags": [
                     "project"
                 ],
-                "summary": "Обновить колонку",
+                "summary": "Обновить проект",
                 "parameters": [
                     {
                         "type": "integer",
@@ -481,6 +499,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -544,6 +565,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 }
             }
@@ -585,6 +609,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 }
             }
@@ -615,6 +642,9 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -667,6 +697,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -854,10 +887,10 @@ const docTemplate = `{
         "domain.UpdateProjectInput": {
             "type": "object",
             "required": [
-                "username"
+                "name"
             ],
             "properties": {
-                "username": {
+                "name": {
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
@@ -867,6 +900,9 @@ const docTemplate = `{
         "domain.UpdateTaskInput": {
             "type": "object",
             "properties": {
+                "column_id": {
+                    "type": "integer"
+                },
                 "deadline": {
                     "type": "string"
                 },

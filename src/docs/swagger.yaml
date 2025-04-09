@@ -121,15 +121,17 @@ definitions:
     type: object
   domain.UpdateProjectInput:
     properties:
-      username:
+      name:
         maxLength: 50
         minLength: 3
         type: string
     required:
-    - username
+    - name
     type: object
   domain.UpdateTaskInput:
     properties:
+      column_id:
+        type: integer
       deadline:
         type: string
       description:
@@ -176,8 +178,6 @@ paths:
             $ref: '#/definitions/v1.tokenResponse'
         "400":
           description: Bad Request
-        "401":
-          description: Unauthorized
       summary: Авторизация
       tags:
       - auth
@@ -241,6 +241,8 @@ paths:
             $ref: '#/definitions/domain.Column'
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
       security:
       - BearerAuth: []
       summary: Создать колонку
@@ -261,6 +263,8 @@ paths:
           description: No Content
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
         "404":
@@ -294,6 +298,8 @@ paths:
             $ref: '#/definitions/domain.Column'
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
         "404":
@@ -334,6 +340,8 @@ paths:
             type: array
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
       security:
       - BearerAuth: []
       summary: Список задач
@@ -365,6 +373,8 @@ paths:
             type: array
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
       security:
       - BearerAuth: []
       summary: Список проектов
@@ -389,6 +399,8 @@ paths:
             $ref: '#/definitions/domain.Project'
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
       security:
       - BearerAuth: []
       summary: Создать проект
@@ -409,6 +421,8 @@ paths:
           description: No Content
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
         "404":
@@ -442,13 +456,15 @@ paths:
             $ref: '#/definitions/domain.Project'
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
         "404":
           description: Not Found
       security:
       - BearerAuth: []
-      summary: Обновить колонку
+      summary: Обновить проект
       tags:
       - project
   /api/v1/projects/{project_id}/columns:
@@ -482,6 +498,8 @@ paths:
             type: array
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
       security:
       - BearerAuth: []
       summary: Список колонок
@@ -507,6 +525,8 @@ paths:
             $ref: '#/definitions/domain.Task'
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
       security:
       - BearerAuth: []
       summary: Создать задачу
@@ -525,6 +545,8 @@ paths:
       responses:
         "204":
           description: No Content
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
         "404":
@@ -558,6 +580,8 @@ paths:
             $ref: '#/definitions/domain.Column'
         "400":
           description: Bad Request
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
         "404":
