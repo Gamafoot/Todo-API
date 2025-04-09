@@ -25,7 +25,6 @@ func (h *handler) initAuthRoutes(api *echo.Group) {
 // @Success 200 {object} tokenResponse
 // @Header 200 {string} Set-Cookie "Устанавливает refresh_token"
 // @Failure 400
-// @Failure 401
 // @Router /api/v1/auth/login [post]
 func (h *handler) Login(c echo.Context) error {
 	input := new(domain.LoginInput)
