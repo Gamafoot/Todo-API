@@ -85,7 +85,7 @@ func (h *handler) CreateProject(c echo.Context) error {
 	return c.JSON(http.StatusCreated, project)
 }
 
-// @Summary Обновить колонку
+// @Summary Обновить проект
 // @Tags project
 // @Accept json
 // @Produce json
