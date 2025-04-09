@@ -22,6 +22,7 @@ type CreateTaskInput struct {
 }
 
 type UpdateTaskInput struct {
+	ColumnId    uint       `json:"column_id"`
 	Name        string     `json:"name" binding:"min=3,max=50"`
 	Description string     `json:"description"`
 	Status      bool       `json:"status"`
