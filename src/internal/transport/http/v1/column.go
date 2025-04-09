@@ -26,6 +26,7 @@ func (h *handler) initColumnRoutes(api *echo.Group) {
 // @Success 200 {array} domain.Column
 // @Header 200 {integer} X-Total-Count "Общее количество колонок на проекте"
 // @Failure 400
+// @Failure 401
 // @Router /api/v1/projects/{project_id}/columns [get]
 func (h *handler) FindColumns(c echo.Context) error {
 	page, err := getIntFromQuery(c, "page", 1)
@@ -70,6 +71,7 @@ func (h *handler) FindColumns(c echo.Context) error {
 // @Param body body domain.CreateColumnInput true "Данные для создания колонки"
 // @Success 200 {object} domain.Column
 // @Failure 400
+// @Failure 401
 // @Router /api/v1/columns [post]
 func (h *handler) CreateColumn(c echo.Context) error {
 	input := new(domain.CreateColumnInput)
@@ -104,6 +106,7 @@ func (h *handler) CreateColumn(c echo.Context) error {
 // @Param body body domain.UpdateColumnInput true "Данные для обновления колонки"
 // @Success 200 {object} domain.Column
 // @Failure 400
+// @Failure 401
 // @Failure 403
 // @Failure 404
 // @Router /api/v1/columns/{column_id} [patch]
@@ -145,6 +148,7 @@ func (h *handler) UpdateColumn(c echo.Context) error {
 // @Param column_id path int true "ID колонки"
 // @Success 204
 // @Failure 400
+// @Failure 401
 // @Failure 403
 // @Failure 404
 // @Router /api/v1/columns/{column_id} [delete]

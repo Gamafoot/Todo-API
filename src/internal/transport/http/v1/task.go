@@ -27,6 +27,7 @@ func (h *handler) initTaskRoutes(api *echo.Group) {
 // @Success 200 {array} domain.Task
 // @Header 200 {integer} X-Total-Count "Общее количество задач на колонке"
 // @Failure 400
+// @Failure 401
 // @Router /api/v1/columns/{column_id}/tasks [get]
 func (h *handler) FindTasks(c echo.Context) error {
 	page := c.QueryParam("page")
@@ -74,6 +75,7 @@ func (h *handler) FindTasks(c echo.Context) error {
 // @Param body body domain.CreateTaskInput true "Данные для создания задачи"
 // @Success 200 {object} domain.Task "Созданная задача"
 // @Failure 400
+// @Failure 401
 // @Router /api/v1/tasks [post]
 func (h *handler) CreateTask(c echo.Context) error {
 	input := new(domain.CreateTaskInput)
@@ -104,6 +106,7 @@ func (h *handler) CreateTask(c echo.Context) error {
 // @Param body body domain.UpdateTaskInput true "Данные для обновления задачи"
 // @Success 200 {object} domain.Column "Обновленная задача"
 // @Failure 400
+// @Failure 401
 // @Failure 403
 // @Failure 404
 // @Router /api/v1/tasks/{task_id} [patch]
@@ -144,6 +147,7 @@ func (h *handler) UpdateTask(c echo.Context) error {
 // @Security BearerAuth
 // @Param task_id path int true "ID задачи"
 // @Success 204
+// @Failure 401
 // @Failure 403
 // @Failure 404
 // @Router /api/v1/tasks/{task_id} [delete]

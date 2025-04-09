@@ -25,6 +25,7 @@ func (h *handler) initProjectRoutes(api *echo.Group) {
 // @Success 200 {array} domain.Project
 // @Header 200 {integer} X-Total-Count "Общее количество проектов у пользователя"
 // @Failure 400
+// @Failure 401
 // @Router /api/v1/projects [get]
 func (h *handler) FindProjects(c echo.Context) error {
 	page, err := getIntFromQuery(c, "page")
@@ -64,6 +65,7 @@ func (h *handler) FindProjects(c echo.Context) error {
 // @Param body body domain.CreateProjectInput true "Данные для создания проекта"
 // @Success 200 {object} domain.Project
 // @Failure 400
+// @Failure 401
 // @Router /api/v1/projects [post]
 func (h *handler) CreateProject(c echo.Context) error {
 	input := new(domain.CreateProjectInput)
@@ -94,6 +96,7 @@ func (h *handler) CreateProject(c echo.Context) error {
 // @Param body body domain.UpdateProjectInput true "Данные для обновления проекта"
 // @Success 200 {object} domain.Project
 // @Failure 400
+// @Failure 401
 // @Failure 403
 // @Failure 404
 // @Router /api/v1/projects/{project_id} [patch]
@@ -135,6 +138,7 @@ func (h *handler) UpdateProject(c echo.Context) error {
 // @Param project_id path int true "ID проекта"
 // @Success 204
 // @Failure 400
+// @Failure 401
 // @Failure 403
 // @Failure 404
 // @Router /api/v1/projects/{project_id} [delete]
