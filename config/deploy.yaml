@@ -23,6 +23,6 @@ cors:
     - "PATCH"
     - "DELETE"
   headers:
+    - "Origin"
     - "Content-Type"
-    - "Set-Cookie"
     - "Authorization"
