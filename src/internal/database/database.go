@@ -27,6 +27,7 @@ func CreateAllTables(db *gorm.DB) error {
 		models.Project{},
 		models.Column{},
 		models.Task{},
+		models.Subtask{},
 	}
 
 	if err := db.AutoMigrate(tables...); err != nil {

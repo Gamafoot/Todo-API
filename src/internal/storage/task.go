@@ -6,7 +6,7 @@ import (
 
 type TaskStorage interface {
 	FindAll(columnId uint, page, limit int) ([]*domain.Task, error)
-	GetAmountPages(userId uint, page, limit int) (int, error)
+	GetAmountPages(columnId uint, page, limit int) (int, error)
 	FindById(taskId uint) (*domain.Task, error)
 	Create(task *domain.Task) error
 	Update(task *domain.Task) error

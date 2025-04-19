@@ -12,14 +12,16 @@ type Storage struct {
 	Project ProjectStorage
 	Column ColumnStorage
 	Task    TaskStorage
+	Subtask SubtaskStorage
 }
 
 func NewPostgresStorage(db *gorm.DB) *Storage {
 	return &Storage{
 		User:    postgres.NewUserStorage(db),
 		Session: postgres.NewSessionStorage(db),
-		Task:    postgres.NewTaskStorage(db),
 		Project: postgres.NewProjectStorage(db),
 		Column: postgres.NewColumnStorage(db),
+		Task:    postgres.NewTaskStorage(db),
+		Subtask: postgres.NewSubtaskStorage(db),
 	}
 }

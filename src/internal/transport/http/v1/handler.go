@@ -45,6 +45,7 @@ func (h *handler) InitRoutes(api *echo.Group) {
 			h.initProjectRoutes(requiredAuth)
 			h.initColumnRoutes(requiredAuth)
 			h.initTaskRoutes(requiredAuth)
+			h.initSubTaskRoutes(requiredAuth)
 		}
 	}
 }
