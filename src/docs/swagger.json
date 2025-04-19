@@ -540,6 +540,135 @@
                 }
             }
         },
+        "/api/v1/subtasks": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subtask"
+                ],
+                "summary": "Создать подзадачу",
+                "parameters": [
+                    {
+                        "description": "Данные для создания подзадачи",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreateSubtaskInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Созданная подзадача",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Subtask"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/v1/subtasks/{subtask_id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subtask"
+                ],
+                "summary": "Удалить подзадачу",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID подзадачи",
+                        "name": "subtask_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subtask"
+                ],
+                "summary": "Обновить подзадачу",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID подзадачи",
+                        "name": "subtask_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные для обновления подзадачи",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UpdateTaskInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Обновленная подзадача",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Subtask"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
         "/api/v1/tasks": {
             "post": {
                 "security": [
@@ -654,7 +783,7 @@
                     "200": {
                         "description": "Обновленная задача",
                         "schema": {
-                            "$ref": "#/definitions/domain.Column"
+                            "$ref": "#/definitions/domain.Task"
                         }
                     },
                     "400": {
@@ -665,6 +794,63 @@
                     },
                     "404": {
                         "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/v1/tasks/{task_id}/subtasks": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subtask"
+                ],
+                "summary": "Список подзадач",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID задачи",
+                        "name": "task_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Номер страницы, по уполчанию 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Кол-во итоговых записей, по уполчанию 10",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Subtask"
+                            }
+                        },
+                        "headers": {
+                            "X-Total-Count": {
+                                "type": "integer",
+                                "description": "Общее количество подзадач на колонке"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     }
                 }
             }
@@ -712,6 +898,30 @@
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
+                }
+            }
+        },
+        "domain.CreateSubtaskInput": {
+            "type": "object",
+            "required": [
+                "name",
+                "status",
+                "task_id"
+            ],
+            "properties": {
+                "deadline": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                },
+                "status": {
+                    "type": "boolean"
+                },
+                "task_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -798,6 +1008,32 @@
                     "type": "string",
                     "maxLength": 25,
                     "minLength": 3
+                }
+            }
+        },
+        "domain.Subtask": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deadline": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "boolean"
+                },
+                "taskId": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
                 }
             }
         },

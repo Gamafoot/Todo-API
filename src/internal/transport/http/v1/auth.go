@@ -41,7 +41,7 @@ func (h *handler) Login(c echo.Context) error {
 	})
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidLoginOrPassword) {
-			return c.NoContent(http.StatusUnauthorized)
+			return c.NoContent(http.StatusBadRequest)
 		}
 		return err
 	}

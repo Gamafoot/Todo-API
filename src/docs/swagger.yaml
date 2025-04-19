@@ -29,6 +29,23 @@ definitions:
     required:
     - username
     type: object
+  domain.CreateSubtaskInput:
+    properties:
+      deadline:
+        type: string
+      name:
+        maxLength: 50
+        minLength: 3
+        type: string
+      status:
+        type: boolean
+      task_id:
+        type: integer
+    required:
+    - name
+    - status
+    - task_id
+    type: object
   domain.CreateTaskInput:
     properties:
       column_id:
@@ -90,6 +107,23 @@ definitions:
     - password
     - re_password
     - username
+    type: object
+  domain.Subtask:
+    properties:
+      createdAt:
+        type: string
+      deadline:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: boolean
+      taskId:
+        type: integer
+      updatedAt:
+        type: string
     type: object
   domain.Task:
     properties:
@@ -487,6 +521,86 @@ paths:
       summary: Список колонок
       tags:
       - column
+  /api/v1/subtasks:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные для создания подзадачи
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateSubtaskInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Созданная подзадача
+          schema:
+            $ref: '#/definitions/domain.Subtask'
+        "400":
+          description: Bad Request
+      security:
+      - BearerAuth: []
+      summary: Создать подзадачу
+      tags:
+      - subtask
+  /api/v1/subtasks/{subtask_id}:
+    delete:
+      parameters:
+      - description: ID подзадачи
+        in: path
+        name: subtask_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      security:
+      - BearerAuth: []
+      summary: Удалить подзадачу
+      tags:
+      - subtask
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID подзадачи
+        in: path
+        name: subtask_id
+        required: true
+        type: integer
+      - description: Данные для обновления подзадачи
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateTaskInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновленная подзадача
+          schema:
+            $ref: '#/definitions/domain.Subtask'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      security:
+      - BearerAuth: []
+      summary: Обновить подзадачу
+      tags:
+      - subtask
   /api/v1/tasks:
     post:
       consumes:
@@ -555,7 +669,7 @@ paths:
         "200":
           description: Обновленная задача
           schema:
-            $ref: '#/definitions/domain.Column'
+            $ref: '#/definitions/domain.Task'
         "400":
           description: Bad Request
         "403":
@@ -567,6 +681,42 @@ paths:
       summary: Обновить задачу
       tags:
       - task
+  /api/v1/tasks/{task_id}/subtasks:
+    get:
+      parameters:
+      - description: ID задачи
+        in: path
+        name: task_id
+        required: true
+        type: integer
+      - description: Номер страницы, по уполчанию 1
+        in: query
+        name: page
+        type: integer
+      - description: Кол-во итоговых записей, по уполчанию 10
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Total-Count:
+              description: Общее количество подзадач на колонке
+              type: integer
+          schema:
+            items:
+              $ref: '#/definitions/domain.Subtask'
+            type: array
+        "400":
+          description: Bad Request
+      security:
+      - BearerAuth: []
+      summary: Список подзадач
+      tags:
+      - subtask
 securityDefinitions:
   BearerAuth:
     in: header

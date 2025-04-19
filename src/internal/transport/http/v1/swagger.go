@@ -6,5 +6,5 @@ import (
 )
 
 func (h *handler) initSwaggerRoutes(api *echo.Group) {
-	api.GET("/swagger/*", echoSwagger.WrapHandler)
+	api.GET("/swagger*", echoSwagger.WrapHandler)
 }
