@@ -7,7 +7,7 @@ type Project struct {
 }
 
 type CreateProjectInput struct {
-	Name string `json:"username" binding:"required,min=3,max=50"`
+	Name string `json:"name" binding:"required,min=3,max=50"`
 }
 
 type UpdateProjectInput struct {
