@@ -10,7 +10,8 @@ import (
 )
 
 func (h *handler) initProjectRoutes(api *echo.Group) {
-	api.GET("/projects", h.FindProjects)
+	api.GET("/projects", h.ListProjects)
+	api.GET("/projects/:project_id", h.DetailProject)
 	api.POST("/projects", h.CreateProject)
 	api.PATCH("/projects/:project_id", h.UpdateProject)
 	api.DELETE("/projects/:project_id", h.DeleteProject)
@@ -26,8 +27,9 @@ func (h *handler) initProjectRoutes(api *echo.Group) {
 // @Header 200 {integer} X-Total-Count "Общее количество проектов у пользователя"
 // @Failure 400
 // @Failure 401
+// @Failure 403
 // @Router /api/v1/projects [get]
-func (h *handler) FindProjects(c echo.Context) error {
+func (h *handler) ListProjects(c echo.Context) error {
 	page, err := getIntFromQuery(c, "page")
 	if err != nil {
 		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -55,6 +57,39 @@ func (h *handler) FindProjects(c echo.Context) error {
 	c.Response().Header().Set("X-Total-Count", fmt.Sprintf("%d", amount))
 
 	return c.JSON(http.StatusOK, columns)
+}
+
+// @Summary Детали проекта
+// @Tags project
+// @Produce json
+// @Security BearerAuth
+// @Param project_id path int true "ID проекта"
+// @Success 200 {object} domain.Project
+// @Failure 400
+// @Failure 401
+// @Failure 403
+// @Router /api/v1/projects/{project_id} [get]
+func (h *handler) DetailProject(c echo.Context) error {
+	userId, err := getUserIdFromContext(c)
+	if err != nil {
+		return err
+	}
+
+	projectId, err := getUIntFromParam(c, "project_id")
+	if err != nil {
+		return err
+	}
+
+	project, err := h.service.Project.Detail(userId, projectId)
+	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return c.NoContent(http.StatusForbidden)
+		}
+
+		return err
+	}
+
+	return c.JSON(http.StatusOK, project)
 }
 
 // @Summary Создать проект

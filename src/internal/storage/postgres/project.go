@@ -100,8 +100,10 @@ func (s *projectStorage) IsOwnedUser(userId, projectId uint) (bool, error) {
 
 func convertProject(project *models.Project) *domain.Project {
 	return &domain.Project{
-		Id:     project.Id,
-		UserId: project.UserId,
-		Name:   project.Name,
+		Id:          project.Id,
+		UserId:      project.UserId,
+		Name:        project.Name,
+		Description: project.Description,
+		Deadline:    project.Deadline,
 	}
 }

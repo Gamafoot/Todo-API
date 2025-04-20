@@ -35,6 +35,24 @@ func (s *projectService) FindAll(userId uint, page, limit int) ([]*domain.Projec
 	return projects, amount, nil
 }
 
+func (s *projectService) Detail(userId, projectId uint) (*domain.Project, error) {
+	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, domain.ErrUserNotOwnedRecord
+	}
+
+	project, err := s.storage.Project.FindById(projectId)
+	if err != nil {
+		return nil, err
+	}
+
+	return project, nil
+}
+
 func (s *projectService) Create(userId uint, input *domain.CreateProjectInput) (*domain.Project, error) {
 	project := &domain.Project{
 		UserId:      userId,

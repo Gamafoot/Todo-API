@@ -6,6 +6,7 @@ import (
 
 type ProjectService interface {
 	FindAll(userId uint, page, limit int) ([]*domain.Project, int, error)
+	Detail(userId, projectId uint) (*domain.Project, error)
 	Create(userId uint, input *domain.CreateProjectInput) (*domain.Project, error)
 	Update(userId, projectId uint, input *domain.UpdateProjectInput) (*domain.Project, error)
 	Delete(userId, projectId uint) error
