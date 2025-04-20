@@ -80,6 +80,10 @@ func (h *handler) CreateColumn(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
+	if err := c.Validate(input); err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
 	userId, err := getUserIdFromContext(c)
 	if err != nil {
 		return err
@@ -114,6 +118,10 @@ func (h *handler) UpdateColumn(c echo.Context) error {
 	input := new(domain.UpdateColumnInput)
 
 	if err := c.Bind(input); err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	if err := c.Validate(input); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 

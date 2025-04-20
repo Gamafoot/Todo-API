@@ -73,12 +73,8 @@ definitions:
   domain.LoginInput:
     properties:
       password:
-        maxLength: 64
-        minLength: 3
         type: string
       username:
-        maxLength: 25
-        minLength: 3
         type: string
     required:
     - password
@@ -117,8 +113,6 @@ definitions:
   domain.Subtask:
     properties:
       created_at:
-        type: string
-      deadline:
         type: string
       id:
         type: integer

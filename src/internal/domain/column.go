@@ -7,10 +7,10 @@ type Column struct {
 }
 
 type CreateColumnInput struct {
-	ProjectId uint   `json:"project_id" binding:"required"`
-	Name      string `json:"name" binding:"required,min=3,max=50"`
+	ProjectId uint   `json:"project_id" validate:"required"`
+	Name      string `json:"name" validate:"required,gte=3,lte=50"`
 }
 
 type UpdateColumnInput struct {
-	Name string `json:"name" binding:"required,min=3,max=50"`
+	Name string `json:"name" validate:"required,gte=3,lte=50"`
 }

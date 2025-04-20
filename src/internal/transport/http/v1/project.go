@@ -109,6 +109,10 @@ func (h *handler) CreateProject(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
+	if err := c.Validate(input); err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
 	userId, err := getUserIdFromContext(c)
 	if err != nil {
 		return err
@@ -139,6 +143,10 @@ func (h *handler) UpdateProject(c echo.Context) error {
 	input := new(domain.UpdateProjectInput)
 
 	if err := c.Bind(input); err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	if err := c.Validate(input); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 

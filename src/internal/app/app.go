@@ -40,6 +40,7 @@ func Run() error {
 	)
 
 	e := echo.New()
+	e.Validator = NewValidator()
 
 	handler := v1.NewHandler(cfg, service, tokenManager)
 	handler.InitRoutes(e.Group(""))

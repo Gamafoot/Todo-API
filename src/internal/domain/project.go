@@ -11,13 +11,13 @@ type Project struct {
 }
 
 type CreateProjectInput struct {
-	Name        string     `json:"name" binding:"required,min=3,max=50"`
+	Name        string     `json:"name" validate:"required,gte=3,lte=50"`
 	Description string     `json:"description"`
 	Deadline    *time.Time `json:"deadline"`
 }
 
 type UpdateProjectInput struct {
-	Name        string     `json:"name" binding:"required,min=3,max=50"`
+	Name        string     `json:"name" validate:"required,gte=3,lte=50"`
 	Description string     `json:"description"`
 	Deadline    *time.Time `json:"deadline"`
 }

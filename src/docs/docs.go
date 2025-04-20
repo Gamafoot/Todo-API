@@ -1051,14 +1051,10 @@ const docTemplate = `{
             ],
             "properties": {
                 "password": {
-                    "type": "string",
-                    "maxLength": 64,
-                    "minLength": 3
+                    "type": "string"
                 },
                 "username": {
-                    "type": "string",
-                    "maxLength": 25,
-                    "minLength": 3
+                    "type": "string"
                 }
             }
         },
@@ -1108,9 +1104,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "created_at": {
-                    "type": "string"
-                },
-                "deadline": {
                     "type": "string"
                 },
                 "id": {

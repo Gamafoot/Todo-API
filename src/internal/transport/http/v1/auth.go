@@ -2,7 +2,6 @@ package v1
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"root/internal/domain"
 	customErrors "root/pkg/errors"
@@ -30,7 +29,10 @@ func (h *handler) Login(c echo.Context) error {
 	input := new(domain.LoginInput)
 
 	if err := c.Bind(input); err != nil {
-		fmt.Printf("r: %s\n", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	if err := c.Validate(input); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
@@ -60,6 +62,10 @@ func (h *handler) Register(c echo.Context) error {
 	input := new(domain.RegisterInput)
 
 	if err := c.Bind(input); err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	if err := c.Validate(input); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
