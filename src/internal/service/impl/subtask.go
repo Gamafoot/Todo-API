@@ -66,7 +66,6 @@ func (s *subtaskService) Create(userId uint, input *domain.CreateSubtaskInput) (
 		TaskId:   input.TaskId,
 		Name:     input.Name,
 		Status:   input.Status,
-		Deadline: input.Deadline,
 	}
 
 	err = s.storage.Subtask.Create(task)
@@ -91,7 +90,6 @@ func (s *subtaskService) Update(userId, subtaskId uint, input *domain.UpdateSubt
 		Id:       subtaskId,
 		Name:     input.Name,
 		Status:   input.Status,
-		Deadline: input.Deadline,
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

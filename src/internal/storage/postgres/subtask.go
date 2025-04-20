@@ -108,7 +108,6 @@ func convertSubtask(task *models.Subtask) *domain.Subtask {
 		TaskId:    task.TaskId,
 		Name:      task.Name,
 		Status:    task.Status,
-		Deadline:  task.Deadline,
 		CreatedAt: task.CreatedAt,
 		UpdatedAt: task.UpdatedAt,
 	}
