@@ -163,7 +163,7 @@ func (h *handler) DeleteColumn(c echo.Context) error {
 		return err
 	}
 
-	err = h.service.Project.Delete(userId, columnId)
+	err = h.service.Column.Delete(userId, columnId)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)
