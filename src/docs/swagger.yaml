@@ -22,12 +22,12 @@ definitions:
     type: object
   domain.CreateProjectInput:
     properties:
-      username:
+      name:
         maxLength: 50
         minLength: 3
         type: string
     required:
-    - username
+    - name
     type: object
   domain.CreateSubtaskInput:
     properties:

@@ -932,10 +932,10 @@ const docTemplate = `{
         "domain.CreateProjectInput": {
             "type": "object",
             "required": [
-                "username"
+                "name"
             ],
             "properties": {
-                "username": {
+                "name": {
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
