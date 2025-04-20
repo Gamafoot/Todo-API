@@ -3,11 +3,11 @@ package domain
 import "time"
 
 type Project struct {
-	Id          uint
-	UserId      uint
-	Name        string
-	Description string
-	Deadline    *time.Time
+	Id          uint       `json:"id"`
+	UserId      uint       `json:"user_id"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	Deadline    *time.Time `json:"deadline"`
 }
 
 type CreateProjectInput struct {

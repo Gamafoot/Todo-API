@@ -1,9 +1,9 @@
 package domain
 
 type Column struct {
-	Id        uint
-	ProjectId uint
-	Name      string
+	Id        uint   `json:"id"`
+	ProjectId uint   `json:"project_id"`
+	Name      string `json:"name"`
 }
 
 type CreateColumnInput struct {

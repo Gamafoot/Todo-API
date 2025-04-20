@@ -3,10 +3,10 @@ package domain
 import "time"
 
 type Session struct {
-	Id           uint
-	UserId       uint
-	RefreshToken string
-	ExpiresAt    time.Time
+	Id           uint      `json:"id"`
+	UserId       uint      `json:"user_id"`
+	RefreshToken string    `json:"refresh_token"`
+	ExpiresAt    time.Time `json:"expires_at"`
 }
 
 type LoginInput struct {

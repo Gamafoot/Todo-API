@@ -950,7 +950,7 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "projectId": {
+                "project_id": {
                     "type": "integer"
                 }
             }
@@ -1077,7 +1077,7 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "userId": {
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -1110,7 +1110,7 @@ const docTemplate = `{
         "domain.Subtask": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "deadline": {
@@ -1125,10 +1125,10 @@ const docTemplate = `{
                 "status": {
                     "type": "boolean"
                 },
-                "taskId": {
+                "task_id": {
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1136,10 +1136,10 @@ const docTemplate = `{
         "domain.Task": {
             "type": "object",
             "properties": {
-                "columnId": {
+                "column_id": {
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "deadline": {
@@ -1157,7 +1157,7 @@ const docTemplate = `{
                 "status": {
                     "type": "boolean"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }

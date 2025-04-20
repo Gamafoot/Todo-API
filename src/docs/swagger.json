@@ -942,7 +942,7 @@
                 "name": {
                     "type": "string"
                 },
-                "projectId": {
+                "project_id": {
                     "type": "integer"
                 }
             }
@@ -1069,7 +1069,7 @@
                 "name": {
                     "type": "string"
                 },
-                "userId": {
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -1102,7 +1102,7 @@
         "domain.Subtask": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "deadline": {
@@ -1117,10 +1117,10 @@
                 "status": {
                     "type": "boolean"
                 },
-                "taskId": {
+                "task_id": {
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1128,10 +1128,10 @@
         "domain.Task": {
             "type": "object",
             "properties": {
-                "columnId": {
+                "column_id": {
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "deadline": {
@@ -1149,7 +1149,7 @@
                 "status": {
                     "type": "boolean"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }

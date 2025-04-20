@@ -3,14 +3,14 @@ package domain
 import "time"
 
 type Task struct {
-	Id          uint
-	ColumnId    uint
-	Name        string
-	Description string
-	Status      bool
-	Deadline    *time.Time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	Id          uint       `json:"id"`
+	ColumnId    uint       `json:"column_id"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	Status      bool       `json:"status"`
+	Deadline    *time.Time `json:"deadline"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
 }
 
 type CreateTaskInput struct {
