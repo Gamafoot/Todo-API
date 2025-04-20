@@ -4,7 +4,7 @@ import "time"
 
 type Project struct {
 	Id          uint       `json:"id"`
-	UserId      uint       `json:"user_id"`
+	UserId      uint       `json:"-"`
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
 	Deadline    *time.Time `json:"deadline"`
