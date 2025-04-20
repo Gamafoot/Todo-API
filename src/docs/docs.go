@@ -1076,9 +1076,6 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },
