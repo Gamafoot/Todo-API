@@ -37,8 +37,10 @@ func (s *projectService) FindAll(userId uint, page, limit int) ([]*domain.Projec
 
 func (s *projectService) Create(userId uint, input *domain.CreateProjectInput) (*domain.Project, error) {
 	project := &domain.Project{
-		UserId: userId,
-		Name:   input.Name,
+		UserId:      userId,
+		Name:        input.Name,
+		Description: input.Description,
+		Deadline:    input.Deadline,
 	}
 
 	err := s.storage.Project.Create(project)
