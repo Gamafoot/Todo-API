@@ -58,6 +58,10 @@ func (h *handler) FindSubtasks(c echo.Context) error {
 
 	tasks, amount, err := h.service.Subtask.FindAll(userId, taskId, pageInt, limitInt)
 	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return c.NoContent(http.StatusForbidden)
+		}
+
 		return err
 	}
 
@@ -89,6 +93,10 @@ func (h *handler) CreateSubtask(c echo.Context) error {
 
 	subtask, err := h.service.Subtask.Create(userId, input)
 	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return c.NoContent(http.StatusForbidden)
+		}
+
 		return err
 	}
 

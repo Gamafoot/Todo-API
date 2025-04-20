@@ -59,6 +59,7 @@ func (h *handler) FindTasks(c echo.Context) error {
 
 	tasks, amount, err := h.service.Task.FindAll(userId, columnId, pageInt, limitInt)
 	if err != nil {
+
 		return err
 	}
 
@@ -91,6 +92,10 @@ func (h *handler) CreateTask(c echo.Context) error {
 
 	task, err := h.service.Task.Create(userId, input)
 	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return c.NoContent(http.StatusForbidden)
+		}
+
 		return err
 	}
 
