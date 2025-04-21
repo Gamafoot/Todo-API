@@ -12,15 +12,13 @@ type Subtask struct {
 }
 
 type CreateSubtaskInput struct {
-	TaskId   uint       `json:"task_id" validate:"required"`
-	Name     string     `json:"name" validate:"required,gte=3,lte=50"`
-	Status   bool       `json:"status" validate:"required"`
-	Deadline *time.Time `json:"deadline"`
+	TaskId uint   `json:"task_id" validate:"required"`
+	Name   string `json:"name" validate:"required,gte=3,lte=50"`
+	Status *bool  `json:"status" validate:"required"`
 }
 
 type UpdateSubtaskInput struct {
-	Name        string     `json:"name" validate:"gte=3,lte=50"`
-	Description string     `json:"description"`
-	Status      bool       `json:"status"`
-	Deadline    *time.Time `json:"deadline"`
+	Name        string `json:"name" validate:"gte=3,lte=50"`
+	Description string `json:"description"`
+	Status      bool   `json:"status"`
 }

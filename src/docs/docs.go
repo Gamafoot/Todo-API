@@ -999,9 +999,6 @@ const docTemplate = `{
                 "task_id"
             ],
             "properties": {
-                "deadline": {
-                    "type": "string"
-                },
                 "name": {
                     "type": "string",
                     "maxLength": 50,

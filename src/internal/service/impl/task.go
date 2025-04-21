@@ -66,7 +66,7 @@ func (s *taskService) Create(userId uint, input *domain.CreateTaskInput) (*domai
 		ColumnId:    input.ColumnId,
 		Name:        input.Name,
 		Description: input.Description,
-		Status:      input.Status,
+		Status:      *input.Status,
 		Deadline:    input.Deadline,
 	}
 

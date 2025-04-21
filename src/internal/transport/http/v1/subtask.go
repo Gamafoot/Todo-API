@@ -86,6 +86,10 @@ func (h *handler) CreateSubtask(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
+	if err := c.Validate(input); err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
 	userId, err := getUserIdFromContext(c)
 	if err != nil {
 		return err
@@ -119,6 +123,10 @@ func (h *handler) UpdateSubtask(c echo.Context) error {
 	input := new(domain.UpdateSubtaskInput)
 
 	if err := c.Bind(input); err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	if err := c.Validate(input); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 

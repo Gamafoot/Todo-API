@@ -35,8 +35,6 @@ definitions:
     type: object
   domain.CreateSubtaskInput:
     properties:
-      deadline:
-        type: string
       name:
         maxLength: 50
         minLength: 3
