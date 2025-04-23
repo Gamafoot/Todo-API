@@ -56,7 +56,7 @@ func (h *handler) FindSubtasks(c echo.Context) error {
 		return err
 	}
 
-	tasks, amount, err := h.service.Subtask.FindAll(userId, taskId, pageInt, limitInt)
+	tasks, amount, err := h.service.Subtask.List(userId, taskId, pageInt, limitInt)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)

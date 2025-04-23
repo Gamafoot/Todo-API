@@ -49,7 +49,7 @@ func (h *handler) FindColumns(c echo.Context) error {
 		return err
 	}
 
-	columns, amount, err := h.service.Column.FindAll(userId, projectId, page, limit)
+	columns, amount, err := h.service.Column.List(userId, projectId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)

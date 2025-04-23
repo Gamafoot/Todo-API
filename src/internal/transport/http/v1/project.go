@@ -45,7 +45,7 @@ func (h *handler) ListProjects(c echo.Context) error {
 		return err
 	}
 
-	columns, amount, err := h.service.Project.FindAll(userId, page, limit)
+	columns, amount, err := h.service.Project.List(userId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)
