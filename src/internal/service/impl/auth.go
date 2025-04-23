@@ -70,7 +70,7 @@ func (s *authService) Register(input *domain.RegisterInput) error {
 		return domain.ErrUsernameIsOccupied
 	}
 
-	err = s.storage.User.Create(&domain.User{
+	_, err = s.storage.User.Create(&domain.User{
 		Username: input.Username,
 		Password: hash,
 	})

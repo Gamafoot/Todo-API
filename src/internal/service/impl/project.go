@@ -21,7 +21,7 @@ func NewProjectService(cfg *config.Config, storage *storage.Storage) *projectSer
 	}
 }
 
-func (s *projectService) FindAll(userId uint, page, limit int) ([]*domain.Project, int, error) {
+func (s *projectService) List(userId uint, page, limit int) ([]*domain.Project, int, error) {
 	projects, err := s.storage.Project.FindAll(userId, page, limit)
 	if err != nil {
 		return nil, 0, err
@@ -61,9 +61,17 @@ func (s *projectService) Create(userId uint, input *domain.CreateProjectInput) (
 		Deadline:    input.Deadline,
 	}
 
-	err := s.storage.Project.Create(project)
+	projectId, err := s.storage.Project.Create(project)
 	if err != nil {
-		return project, nil
+		return nil, err
+	}
+
+	project, err = s.storage.Project.FindById(projectId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrRecordNotFound
+		}
+		return nil, err
 	}
 
 	return project, nil
@@ -88,7 +96,6 @@ func (s *projectService) Update(userId, projectId uint, input *domain.UpdateProj
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, domain.ErrRecordNotFound
 		}
-
 		return nil, err
 	}
 

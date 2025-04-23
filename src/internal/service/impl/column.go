@@ -21,7 +21,7 @@ func NewColumnService(cfg *config.Config, storage *storage.Storage) *columnServi
 	}
 }
 
-func (s *columnService) FindAll(userId, projectId uint, page, limit int) ([]*domain.Column, int, error) {
+func (s *columnService) List(userId, projectId uint, page, limit int) ([]*domain.Column, int, error) {
 	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
 	if err != nil {
 		return nil, 0, err
@@ -41,7 +41,6 @@ func (s *columnService) FindAll(userId, projectId uint, page, limit int) ([]*dom
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, 0, domain.ErrRecordNotFound
 		}
-
 		return nil, 0, err
 	}
 
@@ -63,8 +62,16 @@ func (s *columnService) Create(userId uint, input *domain.CreateColumnInput) (*d
 		Name:      input.Name,
 	}
 
-	err = s.storage.Column.Create(column)
+	columnId, err := s.storage.Column.Create(column)
 	if err != nil {
+		return nil, err
+	}
+
+	column, err = s.storage.Column.FindById(columnId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrRecordNotFound
+		}
 		return nil, err
 	}
 
@@ -89,7 +96,6 @@ func (s *columnService) Update(userId, columnId uint, input *domain.UpdateColumn
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, domain.ErrRecordNotFound
 		}
-
 		return nil, err
 	}
 
@@ -98,7 +104,6 @@ func (s *columnService) Update(userId, columnId uint, input *domain.UpdateColumn
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, domain.ErrRecordNotFound
 		}
-
 		return nil, err
 	}
 

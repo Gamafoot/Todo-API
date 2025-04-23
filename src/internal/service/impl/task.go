@@ -21,7 +21,7 @@ func NewTaskService(cfg *config.Config, storage *storage.Storage) *taskService {
 	}
 }
 
-func (s *taskService) FindAll(userId, columnId uint, page, limit int) ([]*domain.Task, int, error) {
+func (s *taskService) List(userId, columnId uint, page, limit int) ([]*domain.Task, int, error) {
 	ok, err := s.storage.Column.IsOwnedUser(userId, columnId)
 	if err != nil {
 		return nil, 0, err
@@ -70,8 +70,17 @@ func (s *taskService) Create(userId uint, input *domain.CreateTaskInput) (*domai
 		Deadline:    input.Deadline,
 	}
 
-	err = s.storage.Task.Create(task)
+	taskId, err := s.storage.Task.Create(task)
 	if err != nil {
+		return nil, err
+	}
+
+	task, err = s.storage.Task.FindById(taskId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrRecordNotFound
+		}
+
 		return nil, err
 	}
 
@@ -100,7 +109,6 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, domain.ErrRecordNotFound
 		}
-
 		return nil, err
 	}
 
@@ -109,7 +117,6 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, domain.ErrRecordNotFound
 		}
-
 		return nil, err
 	}
 
