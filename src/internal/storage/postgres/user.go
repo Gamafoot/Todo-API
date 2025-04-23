@@ -22,7 +22,7 @@ func (s *userStorage) GetById(userID uint) (*domain.User, error) {
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	return convertUser(user), nil
+	return toDomainUser(user), nil
 }
 
 func (s *userStorage) GetByUsername(username string) (*domain.User, error) {
@@ -31,14 +31,15 @@ func (s *userStorage) GetByUsername(username string) (*domain.User, error) {
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	return convertUser(user), nil
+	return toDomainUser(user), nil
 }
 
-func (s *userStorage) Create(user *domain.User) error {
-	if err := s.db.Create(user).Error; err != nil {
-		return pkgErrors.WithStack(err)
+func (s *userStorage) Create(user *domain.User) (uint, error) {
+	modelUser := toModelUser(user)
+	if err := s.db.Create(modelUser).Error; err != nil {
+		return 0, pkgErrors.WithStack(err)
 	}
-	return nil
+	return modelUser.Id, nil
 }
 
 func (s *userStorage) Delete(userId uint) error {
@@ -48,8 +49,17 @@ func (s *userStorage) Delete(userId uint) error {
 	return nil
 }
 
-func convertUser(user *model.User) *domain.User {
+func toDomainUser(user *model.User) *domain.User {
 	return &domain.User{
+		Id:        user.Id,
+		Username:  user.Username,
+		Password:  user.Password,
+		CreatedAt: user.CreatedAt,
+	}
+}
+
+func toModelUser(user *domain.User) *model.User {
+	return &model.User{
 		Id:        user.Id,
 		Username:  user.Username,
 		Password:  user.Password,

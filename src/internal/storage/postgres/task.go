@@ -28,7 +28,7 @@ func (s *taskStorage) FindAll(columnId uint, page, limit int) ([]*domain.Task, e
 
 	resultTasks := make([]*domain.Task, len(tasks))
 	for i, task := range tasks {
-		resultTasks[i] = convertTask(task)
+		resultTasks[i] = toDomainTask(task)
 	}
 
 	return resultTasks, nil
@@ -52,14 +52,15 @@ func (s *taskStorage) FindById(taskId uint) (*domain.Task, error) {
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	return convertTask(task), nil
+	return toDomainTask(task), nil
 }
 
-func (s *taskStorage) Create(task *domain.Task) error {
-	if err := s.db.Create(task).Error; err != nil {
-		return pkgErrors.WithStack(err)
+func (s *taskStorage) Create(task *domain.Task) (uint, error) {
+	modelTask := toModelTask(task)
+	if err := s.db.Create(modelTask).Error; err != nil {
+		return 0, pkgErrors.WithStack(err)
 	}
-	return nil
+	return modelTask.Id, nil
 }
 
 func (s *taskStorage) Update(task *domain.Task) error {
@@ -97,8 +98,22 @@ func (s *taskStorage) IsOwnedUser(userId, taskId uint) (bool, error) {
 	return true, nil
 }
 
-func convertTask(task *model.Task) *domain.Task {
+func toDomainTask(task *model.Task) *domain.Task {
 	return &domain.Task{
+		Id:          task.Id,
+		ColumnId:    task.ColumnId,
+		Name:        task.Name,
+		Status:      task.Status,
+		Archived:    task.Archived,
+		Description: task.Description,
+		Deadline:    task.Deadline,
+		CreatedAt:   task.CreatedAt,
+		UpdatedAt:   task.UpdatedAt,
+	}
+}
+
+func toModelTask(task *domain.Task) *model.Task {
+	return &model.Task{
 		Id:          task.Id,
 		ColumnId:    task.ColumnId,
 		Name:        task.Name,

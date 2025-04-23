@@ -5,6 +5,6 @@ import "root/internal/domain"
 type UserStorage interface {
 	GetById(userId uint) (*domain.User, error)
 	GetByUsername(username string) (*domain.User, error)
-	Create(user *domain.User) error
+	Create(user *domain.User) (uint, error)
 	Delete(userId uint) error
 }

@@ -8,7 +8,7 @@ type TaskStorage interface {
 	FindAll(columnId uint, page, limit int) ([]*domain.Task, error)
 	GetAmountPages(columnId uint, limit int) (int, error)
 	FindById(taskId uint) (*domain.Task, error)
-	Create(task *domain.Task) error
+	Create(task *domain.Task) (uint, error)
 	Update(task *domain.Task) error
 	Delete(taskId uint) error
 	IsOwnedUser(userId, taskId uint) (bool, error)

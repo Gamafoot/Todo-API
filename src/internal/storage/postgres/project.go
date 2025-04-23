@@ -27,7 +27,7 @@ func (s *projectStorage) FindAll(userId uint, page, limit int) ([]*domain.Projec
 
 	resultProjects := make([]*domain.Project, len(projects))
 	for i, project := range projects {
-		resultProjects[i] = convertProject(project)
+		resultProjects[i] = toDomainProject(project)
 	}
 
 	return resultProjects, nil
@@ -51,14 +51,15 @@ func (s *projectStorage) FindById(id uint) (*domain.Project, error) {
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	return convertProject(project), nil
+	return toDomainProject(project), nil
 }
 
-func (s *projectStorage) Create(project *domain.Project) error {
-	if err := s.db.Create(project).Error; err != nil {
-		return pkgErrors.WithStack(err)
+func (s *projectStorage) Create(project *domain.Project) (uint, error) {
+	modelProject := toModelProject(project)
+	if err := s.db.Create(modelProject).Error; err != nil {
+		return 0, pkgErrors.WithStack(err)
 	}
-	return nil
+	return modelProject.Id, nil
 }
 
 func (s *projectStorage) Update(project *domain.Project) error {
@@ -94,8 +95,21 @@ func (s *projectStorage) IsOwnedUser(userId, projectId uint) (bool, error) {
 	return true, nil
 }
 
-func convertProject(project *model.Project) *domain.Project {
+func toDomainProject(project *model.Project) *domain.Project {
 	return &domain.Project{
+		Id:          project.Id,
+		UserId:      project.UserId,
+		Name:        project.Name,
+		Description: project.Description,
+		Deadline:    project.Deadline,
+		Archived:    project.Archived,
+		CreatedAt:   project.CreatedAt,
+		UpdatedAt:   project.UpdatedAt,
+	}
+}
+
+func toModelProject(project *domain.Project) *model.Project {
+	return &model.Project{
 		Id:          project.Id,
 		UserId:      project.UserId,
 		Name:        project.Name,

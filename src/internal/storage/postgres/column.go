@@ -28,7 +28,7 @@ func (s *columnStorage) FindAll(projectId uint, page, limit int) ([]*domain.Colu
 
 	resultColumns := make([]*domain.Column, len(columns))
 	for i, column := range columns {
-		resultColumns[i] = convertColumn(column)
+		resultColumns[i] = toDomainColumn(column)
 	}
 
 	return resultColumns, nil
@@ -52,14 +52,16 @@ func (s *columnStorage) FindById(columnId uint) (*domain.Column, error) {
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	return convertColumn(column), nil
+	return toDomainColumn(column), nil
 }
 
-func (s *columnStorage) Create(column *domain.Column) error {
-	if err := s.db.Create(column).Error; err != nil {
-		return pkgErrors.WithStack(err)
+func (s *columnStorage) Create(column *domain.Column) (uint, error) {
+	modelColumn := toModelColumn(column)
+	if err := s.db.Create(modelColumn).Error; err != nil {
+		return 0, pkgErrors.WithStack(err)
 	}
-	return nil
+
+	return modelColumn.Id, nil
 }
 
 func (s *columnStorage) Update(column *domain.Column) error {
@@ -96,8 +98,16 @@ func (s *columnStorage) IsOwnedUser(userId, columnId uint) (bool, error) {
 	return true, nil
 }
 
-func convertColumn(column *model.Column) *domain.Column {
+func toDomainColumn(column *model.Column) *domain.Column {
 	return &domain.Column{
+		Id:        column.Id,
+		ProjectId: column.ProjectId,
+		Name:      column.Name,
+	}
+}
+
+func toModelColumn(column *domain.Column) *model.Column {
+	return &model.Column{
 		Id:        column.Id,
 		ProjectId: column.ProjectId,
 		Name:      column.Name,

@@ -28,7 +28,7 @@ func (s *subtaskStorage) FindAll(taskId uint, page, limit int) ([]*domain.Subtas
 
 	resultTasks := make([]*domain.Subtask, len(tasks))
 	for i, task := range tasks {
-		resultTasks[i] = convertSubtask(task)
+		resultTasks[i] = toDomainSubtask(task)
 	}
 
 	return resultTasks, nil
@@ -52,14 +52,15 @@ func (s *subtaskStorage) FindById(taskId uint) (*domain.Subtask, error) {
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	return convertSubtask(subtask), nil
+	return toDomainSubtask(subtask), nil
 }
 
-func (s *subtaskStorage) Create(subtask *domain.Subtask) error {
-	if err := s.db.Create(subtask).Error; err != nil {
-		return pkgErrors.WithStack(err)
+func (s *subtaskStorage) Create(subtask *domain.Subtask) (uint, error) {
+	modelSubtask := toModelSubtask(subtask)
+	if err := s.db.Create(modelSubtask).Error; err != nil {
+		return 0, pkgErrors.WithStack(err)
 	}
-	return nil
+	return modelSubtask.Id, nil
 }
 
 func (s *subtaskStorage) Update(sub *domain.Subtask) error {
@@ -98,14 +99,26 @@ func (s *subtaskStorage) IsOwnedUser(userId, taskId uint) (bool, error) {
 	return true, nil
 }
 
-func convertSubtask(task *model.Subtask) *domain.Subtask {
+func toDomainSubtask(subtask *model.Subtask) *domain.Subtask {
 	return &domain.Subtask{
-		Id:        task.Id,
-		TaskId:    task.TaskId,
-		Name:      task.Name,
-		Status:    task.Status,
-		Archived:  task.Archived,
-		CreatedAt: task.CreatedAt,
-		UpdatedAt: task.UpdatedAt,
+		Id:        subtask.Id,
+		TaskId:    subtask.TaskId,
+		Name:      subtask.Name,
+		Status:    subtask.Status,
+		Archived:  subtask.Archived,
+		CreatedAt: subtask.CreatedAt,
+		UpdatedAt: subtask.UpdatedAt,
+	}
+}
+
+func toModelSubtask(subtask *domain.Subtask) *model.Subtask {
+	return &model.Subtask{
+		Id:        subtask.Id,
+		TaskId:    subtask.TaskId,
+		Name:      subtask.Name,
+		Status:    subtask.Status,
+		Archived:  subtask.Archived,
+		CreatedAt: subtask.CreatedAt,
+		UpdatedAt: subtask.UpdatedAt,
 	}
 }
