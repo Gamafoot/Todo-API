@@ -10,7 +10,7 @@ import (
 )
 
 func (h *handler) initColumnRoutes(api *echo.Group) {
-	api.GET("/projects/:project_id/columns", h.FindColumns)
+	api.GET("/projects/:project_id/columns", h.ListColumns)
 	api.POST("/columns", h.CreateColumn)
 	api.PATCH("/columns/:column_id", h.UpdateColumn)
 	api.DELETE("/columns/:column_id", h.DeleteColumn)
@@ -28,7 +28,7 @@ func (h *handler) initColumnRoutes(api *echo.Group) {
 // @Failure 400
 // @Failure 401
 // @Router /api/v1/projects/{project_id}/columns [get]
-func (h *handler) FindColumns(c echo.Context) error {
+func (h *handler) ListColumns(c echo.Context) error {
 	page, err := getIntFromQuery(c, "page", 1)
 	if err != nil {
 		return NewErrorResponse(c, http.StatusBadRequest, err.Error())

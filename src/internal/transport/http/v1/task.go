@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"root/internal/domain"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
 
 func (h *handler) initTaskRoutes(api *echo.Group) {
-	api.GET("/columns/:column_id/tasks", h.FindTasks)
+	api.GET("/columns/:column_id/tasks", h.ListTasks)
 	api.POST("/tasks", h.CreateTask)
 	api.PATCH("/tasks/:task_id", h.UpdateTask)
 	api.DELETE("/tasks/:task_id", h.DeleteTask)
@@ -29,22 +28,15 @@ func (h *handler) initTaskRoutes(api *echo.Group) {
 // @Failure 400
 // @Failure 401
 // @Router /api/v1/columns/{column_id}/tasks [get]
-func (h *handler) FindTasks(c echo.Context) error {
-	page := c.QueryParam("page")
-	limit := c.QueryParam("limit")
-
-	pageInt, err := strconv.Atoi(page)
+func (h *handler) ListTasks(c echo.Context) error {
+	page, err := getIntFromQuery(c, "page", 1)
 	if err != nil {
 		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
-	limitInt, err := strconv.Atoi(limit)
+	limit, err := getIntFromQuery(c, "limit", 10)
 	if err != nil {
 		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
-	}
-
-	if limitInt > 10 {
-		limitInt = 10
 	}
 
 	userId, err := getUserIdFromContext(c)
@@ -57,7 +49,7 @@ func (h *handler) FindTasks(c echo.Context) error {
 		return err
 	}
 
-	tasks, amount, err := h.service.Task.List(userId, columnId, pageInt, limitInt)
+	tasks, amount, err := h.service.Task.List(userId, columnId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)

@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"root/internal/domain"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
 
 func (h *handler) initSubTaskRoutes(api *echo.Group) {
-	api.GET("/tasks/:task_id/subtasks", h.FindSubtasks)
+	api.GET("/tasks/:task_id/subtasks", h.ListSubtasks)
 	api.POST("/subtasks", h.CreateSubtask)
 	api.PATCH("/subtasks/:subtask_id", h.UpdateSubtask)
 	api.DELETE("/subtasks/:subtask_id", h.DeleteSubtask)
@@ -28,22 +27,15 @@ func (h *handler) initSubTaskRoutes(api *echo.Group) {
 // @Header 200 {integer} X-Total-Pages "Общее количество страниц подзадач на колонке"
 // @Failure 400
 // @Router /api/v1/tasks/{task_id}/subtasks [get]
-func (h *handler) FindSubtasks(c echo.Context) error {
-	page := c.QueryParam("page")
-	limit := c.QueryParam("limit")
-
-	pageInt, err := strconv.Atoi(page)
+func (h *handler) ListSubtasks(c echo.Context) error {
+	page, err := getIntFromQuery(c, "page", 1)
 	if err != nil {
 		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
-	limitInt, err := strconv.Atoi(limit)
+	limit, err := getIntFromQuery(c, "limit", 10)
 	if err != nil {
 		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
-	}
-
-	if limitInt > 10 {
-		limitInt = 10
 	}
 
 	userId, err := getUserIdFromContext(c)
@@ -56,7 +48,7 @@ func (h *handler) FindSubtasks(c echo.Context) error {
 		return err
 	}
 
-	tasks, amount, err := h.service.Subtask.List(userId, taskId, pageInt, limitInt)
+	tasks, amount, err := h.service.Subtask.List(userId, taskId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)
