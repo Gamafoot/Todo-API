@@ -1,4 +1,4 @@
-package models
+package model
 
 type Column struct {
 	Id        uint    `gorm:"primaryKey"`

@@ -2,7 +2,7 @@ package database
 
 import (
 	"log"
-	"root/internal/database/models"
+	"root/internal/database/model"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -22,12 +22,12 @@ func NewConnect(dbURL string) (*gorm.DB, error) {
 
 func CreateAllTables(db *gorm.DB) error {
 	tables := []interface{}{
-		models.User{},
-		models.Session{},
-		models.Project{},
-		models.Column{},
-		models.Task{},
-		models.Subtask{},
+		model.User{},
+		model.Session{},
+		model.Project{},
+		model.Column{},
+		model.Task{},
+		model.Subtask{},
 	}
 
 	if err := db.AutoMigrate(tables...); err != nil {

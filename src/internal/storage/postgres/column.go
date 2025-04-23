@@ -3,7 +3,7 @@ package postgres
 import (
 	"errors"
 	"math"
-	"root/internal/database/models"
+	"root/internal/database/model"
 	"root/internal/domain"
 
 	pkgErrors "github.com/pkg/errors"
@@ -21,7 +21,7 @@ func NewColumnStorage(db *gorm.DB) *columnStorage {
 func (s *columnStorage) FindAll(projectId uint, page, limit int) ([]*domain.Column, error) {
 	offset := (page - 1) * limit
 
-	columns := make([]*models.Column, 0)
+	columns := make([]*model.Column, 0)
 	if err := s.db.Offset(offset).Limit(limit).Find(&columns, "project_id = ?", projectId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
@@ -37,7 +37,7 @@ func (s *columnStorage) FindAll(projectId uint, page, limit int) ([]*domain.Colu
 func (s *columnStorage) GetAmountPages(columnId uint, limit int) (int, error) {
 	var count int64
 
-	if err := s.db.Model(&models.Column{}).Where("column_id = ?", columnId).Count(&count).Error; err != nil {
+	if err := s.db.Model(&model.Column{}).Where("column_id = ?", columnId).Count(&count).Error; err != nil {
 		return 0, pkgErrors.WithStack(err)
 	}
 
@@ -47,7 +47,7 @@ func (s *columnStorage) GetAmountPages(columnId uint, limit int) (int, error) {
 }
 
 func (s *columnStorage) FindById(columnId uint) (*domain.Column, error) {
-	column := new(models.Column)
+	column := new(model.Column)
 	if err := s.db.Find(&column, "id = ?", columnId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
@@ -63,21 +63,21 @@ func (s *columnStorage) Create(column *domain.Column) error {
 }
 
 func (s *columnStorage) Update(column *domain.Column) error {
-	if err := s.db.Model(models.Column{}).Where("id = ?", column.Id).Updates(column).Error; err != nil {
+	if err := s.db.Model(model.Column{}).Where("id = ?", column.Id).Updates(column).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
 }
 
 func (s *columnStorage) Delete(columnId uint) error {
-	if err := s.db.Delete(&models.Column{Id: columnId}).Error; err != nil {
+	if err := s.db.Delete(&model.Column{Id: columnId}).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
 }
 
 func (s *columnStorage) IsOwnedUser(userId, columnId uint) (bool, error) {
-	column := new(models.Column)
+	column := new(model.Column)
 
 	err := s.db.
 		Joins("JOIN projects ON projects.id = columns.project_id").
@@ -96,7 +96,7 @@ func (s *columnStorage) IsOwnedUser(userId, columnId uint) (bool, error) {
 	return true, nil
 }
 
-func convertColumn(column *models.Column) *domain.Column {
+func convertColumn(column *model.Column) *domain.Column {
 	return &domain.Column{
 		Id:        column.Id,
 		ProjectId: column.ProjectId,

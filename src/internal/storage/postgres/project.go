@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"math"
-	"root/internal/database/models"
+	"root/internal/database/model"
 	"root/internal/domain"
 
 	pkgErrors "github.com/pkg/errors"
@@ -20,7 +20,7 @@ func NewProjectStorage(db *gorm.DB) *projectStorage {
 func (s *projectStorage) FindAll(userId uint, page, limit int) ([]*domain.Project, error) {
 	offset := (page - 1) * limit
 
-	projects := make([]*models.Project, 0)
+	projects := make([]*model.Project, 0)
 	if err := s.db.Offset(offset).Limit(limit).Find(&projects, "user_id = ?", userId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
@@ -36,7 +36,7 @@ func (s *projectStorage) FindAll(userId uint, page, limit int) ([]*domain.Projec
 func (s *projectStorage) GetAmountPages(userId uint, limit int) (int, error) {
 	var count int64
 
-	if err := s.db.Model(&models.Project{}).Where("user_id = ?", userId).Count(&count).Error; err != nil {
+	if err := s.db.Model(&model.Project{}).Where("user_id = ?", userId).Count(&count).Error; err != nil {
 		return 0, pkgErrors.WithStack(err)
 	}
 
@@ -46,7 +46,7 @@ func (s *projectStorage) GetAmountPages(userId uint, limit int) (int, error) {
 }
 
 func (s *projectStorage) FindById(id uint) (*domain.Project, error) {
-	project := new(models.Project)
+	project := new(model.Project)
 	if err := s.db.Find(&project, "id = ?", id).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
@@ -62,21 +62,21 @@ func (s *projectStorage) Create(project *domain.Project) error {
 }
 
 func (s *projectStorage) Update(project *domain.Project) error {
-	if err := s.db.Model(models.Project{}).Where("id = ?", project.Id).Updates(project).Error; err != nil {
+	if err := s.db.Model(model.Project{}).Where("id = ?", project.Id).Updates(project).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
 }
 
 func (s *projectStorage) Delete(id uint) error {
-	if err := s.db.Delete(&models.Project{Id: id}).Error; err != nil {
+	if err := s.db.Delete(&model.Project{Id: id}).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
 }
 
 func (s *projectStorage) IsOwnedUser(userId, projectId uint) (bool, error) {
-	project := new(models.Project)
+	project := new(model.Project)
 
 	err := s.db.
 		Joins("JOIN users ON users.id = projects.user_id").
@@ -94,7 +94,7 @@ func (s *projectStorage) IsOwnedUser(userId, projectId uint) (bool, error) {
 	return true, nil
 }
 
-func convertProject(project *models.Project) *domain.Project {
+func convertProject(project *model.Project) *domain.Project {
 	return &domain.Project{
 		Id:          project.Id,
 		UserId:      project.UserId,

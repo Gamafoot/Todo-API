@@ -3,7 +3,7 @@ package postgres
 import (
 	"errors"
 	"math"
-	"root/internal/database/models"
+	"root/internal/database/model"
 	"root/internal/domain"
 
 	pkgErrors "github.com/pkg/errors"
@@ -21,7 +21,7 @@ func NewTaskStorage(db *gorm.DB) *taskStorage {
 func (s *taskStorage) FindAll(columnId uint, page, limit int) ([]*domain.Task, error) {
 	offset := (page - 1) * limit
 
-	tasks := make([]*models.Task, 0)
+	tasks := make([]*model.Task, 0)
 	if err := s.db.Offset(offset).Limit(limit).Find(&tasks, "column_id = ?", columnId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
@@ -37,7 +37,7 @@ func (s *taskStorage) FindAll(columnId uint, page, limit int) ([]*domain.Task, e
 func (s *taskStorage) GetAmountPages(columnId uint, limit int) (int, error) {
 	var count int64
 
-	if err := s.db.Model(&models.Task{}).Where("column_id = ?", columnId).Count(&count).Error; err != nil {
+	if err := s.db.Model(&model.Task{}).Where("column_id = ?", columnId).Count(&count).Error; err != nil {
 		return 0, pkgErrors.WithStack(err)
 	}
 
@@ -47,7 +47,7 @@ func (s *taskStorage) GetAmountPages(columnId uint, limit int) (int, error) {
 }
 
 func (s *taskStorage) FindById(taskId uint) (*domain.Task, error) {
-	task := new(models.Task)
+	task := new(model.Task)
 	if err := s.db.Find(&task, "id = ?", taskId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
@@ -63,7 +63,7 @@ func (s *taskStorage) Create(task *domain.Task) error {
 }
 
 func (s *taskStorage) Update(task *domain.Task) error {
-	if err := s.db.Model(models.Task{}).Where("id = ?", task.Id).Updates(task).Error; err != nil {
+	if err := s.db.Model(model.Task{}).Where("id = ?", task.Id).Updates(task).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
@@ -77,7 +77,7 @@ func (s *taskStorage) Delete(taskId uint) error {
 }
 
 func (s *taskStorage) IsOwnedUser(userId, taskId uint) (bool, error) {
-	task := new(models.Task)
+	task := new(model.Task)
 
 	err := s.db.
 		Joins("JOIN columns ON columns.id = tasks.column_id").
@@ -97,7 +97,7 @@ func (s *taskStorage) IsOwnedUser(userId, taskId uint) (bool, error) {
 	return true, nil
 }
 
-func convertTask(task *models.Task) *domain.Task {
+func convertTask(task *model.Task) *domain.Task {
 	return &domain.Task{
 		Id:          task.Id,
 		ColumnId:    task.ColumnId,

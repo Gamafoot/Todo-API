@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"root/internal/database/models"
+	"root/internal/database/model"
 	"root/internal/domain"
 
 	pkgErrors "github.com/pkg/errors"
@@ -24,7 +24,7 @@ func (s sessionStorage) Set(session *domain.Session) error {
 }
 
 func (s sessionStorage) Get(userId uint, refreshToken string) (domain.Session, error) {
-	session := models.Session{}
+	session := model.Session{}
 	if err := s.db.First(&session, "user_id = ? AND refresh_token = ?", userId, refreshToken).Error; err != nil {
 		return convertSession(&session), pkgErrors.WithStack(err)
 	}
@@ -32,7 +32,7 @@ func (s sessionStorage) Get(userId uint, refreshToken string) (domain.Session, e
 	return convertSession(&session), nil
 }
 
-func convertSession(session *models.Session) domain.Session {
+func convertSession(session *model.Session) domain.Session {
 	return domain.Session{
 		Id:           session.Id,
 		UserId:       session.UserId,

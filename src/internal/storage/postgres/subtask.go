@@ -3,7 +3,7 @@ package postgres
 import (
 	"errors"
 	"math"
-	"root/internal/database/models"
+	"root/internal/database/model"
 	"root/internal/domain"
 
 	pkgErrors "github.com/pkg/errors"
@@ -21,7 +21,7 @@ func NewSubtaskStorage(db *gorm.DB) *subtaskStorage {
 func (s *subtaskStorage) FindAll(taskId uint, page, limit int) ([]*domain.Subtask, error) {
 	offset := (page - 1) * limit
 
-	tasks := make([]*models.Subtask, 0)
+	tasks := make([]*model.Subtask, 0)
 	if err := s.db.Offset(offset).Limit(limit).Find(&tasks, "task_id = ?", taskId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
@@ -37,7 +37,7 @@ func (s *subtaskStorage) FindAll(taskId uint, page, limit int) ([]*domain.Subtas
 func (s *subtaskStorage) GetAmountPages(taskId uint, limit int) (int, error) {
 	var count int64
 
-	if err := s.db.Model(&models.Subtask{}).Where("task_id = ?", taskId).Count(&count).Error; err != nil {
+	if err := s.db.Model(&model.Subtask{}).Where("task_id = ?", taskId).Count(&count).Error; err != nil {
 		return 0, pkgErrors.WithStack(err)
 	}
 
@@ -47,7 +47,7 @@ func (s *subtaskStorage) GetAmountPages(taskId uint, limit int) (int, error) {
 }
 
 func (s *subtaskStorage) FindById(taskId uint) (*domain.Subtask, error) {
-	subtask := new(models.Subtask)
+	subtask := new(model.Subtask)
 	if err := s.db.Find(&subtask, "id = ?", taskId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
@@ -63,7 +63,7 @@ func (s *subtaskStorage) Create(subtask *domain.Subtask) error {
 }
 
 func (s *subtaskStorage) Update(sub *domain.Subtask) error {
-	if err := s.db.Model(models.Subtask{}).Where("id = ?", sub.Id).Updates(sub).Error; err != nil {
+	if err := s.db.Model(model.Subtask{}).Where("id = ?", sub.Id).Updates(sub).Error; err != nil {
 		return pkgErrors.WithStack(err)
 	}
 	return nil
@@ -77,7 +77,7 @@ func (s *subtaskStorage) Delete(subtaskId uint) error {
 }
 
 func (s *subtaskStorage) IsOwnedUser(userId, taskId uint) (bool, error) {
-	subtask := new(models.Subtask)
+	subtask := new(model.Subtask)
 
 	err := s.db.
 		Joins("JOIN tasks ON tasks.id = subtasks.task_id").
@@ -98,7 +98,7 @@ func (s *subtaskStorage) IsOwnedUser(userId, taskId uint) (bool, error) {
 	return true, nil
 }
 
-func convertSubtask(task *models.Subtask) *domain.Subtask {
+func convertSubtask(task *model.Subtask) *domain.Subtask {
 	return &domain.Subtask{
 		Id:        task.Id,
 		TaskId:    task.TaskId,

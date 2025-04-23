@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"root/internal/database/models"
+	"root/internal/database/model"
 	"root/internal/domain"
 
 	pkgErrors "github.com/pkg/errors"
@@ -17,7 +17,7 @@ func NewUserStorage(db *gorm.DB) *userStorage {
 }
 
 func (s *userStorage) GetById(userID uint) (*domain.User, error) {
-	user := new(models.User)
+	user := new(model.User)
 	if err := s.db.First(user, "id = ?", userID).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
@@ -26,7 +26,7 @@ func (s *userStorage) GetById(userID uint) (*domain.User, error) {
 }
 
 func (s *userStorage) GetByUsername(username string) (*domain.User, error) {
-	user := new(models.User)
+	user := new(model.User)
 	if err := s.db.First(user, "username = ?", username).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
@@ -48,7 +48,7 @@ func (s *userStorage) Delete(userId uint) error {
 	return nil
 }
 
-func convertUser(user *models.User) *domain.User {
+func convertUser(user *model.User) *domain.User {
 	return &domain.User{
 		Id:        user.Id,
 		Username:  user.Username,
