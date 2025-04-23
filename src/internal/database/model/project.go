@@ -9,8 +9,8 @@ type Project struct {
 	Description string     `gorm:"type:text"`
 	Archived    bool       `gorm:"default:false"`
 	Deadline    *time.Time `gorm:"type:timestamptz"`
-	CreatedAt   time.Time  `gorm:"type:timestamptz;not null"`
-	UpdatedAt   time.Time  `gorm:"type:timestamptz;not null"`
+	CreatedAt   time.Time  `gorm:"not null"`
+	UpdatedAt   time.Time  `gorm:"not null"`
 	User        User       `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 

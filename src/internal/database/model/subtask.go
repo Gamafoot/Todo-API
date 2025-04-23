@@ -9,8 +9,8 @@ type Subtask struct {
 	Status    bool       `gorm:"default:false"`
 	Archived  bool       `gorm:"default:false"`
 	Deadline  *time.Time `gorm:"type:timestamptz"`
-	CreatedAt time.Time  `gorm:"type:timestamptz;not null"`
-	UpdatedAt time.Time  `gorm:"type:timestamptz;not null"`
+	CreatedAt time.Time  `gorm:"not null"`
+	UpdatedAt time.Time  `gorm:"not null"`
 	Task      Task       `gorm:"foreignKey:TaskId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
