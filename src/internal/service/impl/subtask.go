@@ -71,7 +71,8 @@ func (s *subtaskService) Create(userId uint, input *domain.CreateSubtaskInput) (
 	if err != nil {
 		return nil, err
 	}
-	s.storage.Subtask.FindById(subtaskId)
+
+	subtask, err = s.storage.Subtask.FindById(subtaskId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, domain.ErrRecordNotFound
