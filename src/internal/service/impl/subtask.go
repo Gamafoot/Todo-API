@@ -65,7 +65,6 @@ func (s *subtaskService) Create(userId uint, input *domain.CreateSubtaskInput) (
 	subtask := &domain.Subtask{
 		TaskId: input.TaskId,
 		Name:   input.Name,
-		Status: *input.Status,
 	}
 
 	subtaskId, err := s.storage.Subtask.Create(subtask)

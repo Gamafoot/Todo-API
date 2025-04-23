@@ -39,13 +39,10 @@ definitions:
         maxLength: 50
         minLength: 3
         type: string
-      status:
-        type: boolean
       task_id:
         type: integer
     required:
     - name
-    - status
     - task_id
     type: object
   domain.CreateTaskInput:
@@ -60,13 +57,10 @@ definitions:
         maxLength: 50
         minLength: 3
         type: string
-      status:
-        type: boolean
     required:
     - column_id
     - description
     - name
-    - status
     type: object
   domain.LoginInput:
     properties:

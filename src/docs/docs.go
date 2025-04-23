@@ -995,7 +995,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "name",
-                "status",
                 "task_id"
             ],
             "properties": {
@@ -1003,9 +1002,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
-                },
-                "status": {
-                    "type": "boolean"
                 },
                 "task_id": {
                     "type": "integer"
@@ -1017,8 +1013,7 @@ const docTemplate = `{
             "required": [
                 "column_id",
                 "description",
-                "name",
-                "status"
+                "name"
             ],
             "properties": {
                 "column_id": {
@@ -1034,9 +1029,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
-                },
-                "status": {
-                    "type": "boolean"
                 }
             }
         },

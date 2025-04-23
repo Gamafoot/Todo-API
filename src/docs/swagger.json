@@ -987,7 +987,6 @@
             "type": "object",
             "required": [
                 "name",
-                "status",
                 "task_id"
             ],
             "properties": {
@@ -995,9 +994,6 @@
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
-                },
-                "status": {
-                    "type": "boolean"
                 },
                 "task_id": {
                     "type": "integer"
@@ -1009,8 +1005,7 @@
             "required": [
                 "column_id",
                 "description",
-                "name",
-                "status"
+                "name"
             ],
             "properties": {
                 "column_id": {
@@ -1026,9 +1021,6 @@
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
-                },
-                "status": {
-                    "type": "boolean"
                 }
             }
         },

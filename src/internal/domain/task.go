@@ -18,13 +18,12 @@ type CreateTaskInput struct {
 	ColumnId    uint       `json:"column_id" validate:"required"`
 	Name        string     `json:"name" validate:"required,gte=3,lte=50"`
 	Description string     `json:"description" validate:"required"`
-	Status      *bool      `json:"status" validate:"required"`
 	Deadline    *time.Time `json:"deadline"`
 }
 
 type UpdateTaskInput struct {
 	ColumnId    uint       `json:"column_id"`
-	Name        string     `json:"name" validate:"gte=3,lte=50"`
+	Name        string     `json:"name" validate:"omitempty,gte=3,lte=50"`
 	Description string     `json:"description"`
 	Status      bool       `json:"status"`
 	Archived    bool       `json:"archived"`
