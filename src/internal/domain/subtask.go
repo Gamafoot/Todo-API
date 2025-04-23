@@ -7,6 +7,7 @@ type Subtask struct {
 	TaskId    uint      `json:"task_id"`
 	Name      string    `json:"name"`
 	Status    bool      `json:"status"`
+	Archived  bool      `json:"archived"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -21,4 +22,5 @@ type UpdateSubtaskInput struct {
 	Name        string `json:"name" validate:"gte=3,lte=50"`
 	Description string `json:"description"`
 	Status      bool   `json:"status"`
+	Archived    bool   `json:"archived"`
 }

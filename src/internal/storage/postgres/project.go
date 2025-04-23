@@ -105,5 +105,8 @@ func convertProject(project *models.Project) *domain.Project {
 		Name:        project.Name,
 		Description: project.Description,
 		Deadline:    project.Deadline,
+		Archived:    project.Archived,
+		CreatedAt:   project.CreatedAt,
+		UpdatedAt:   project.UpdatedAt,
 	}
 }

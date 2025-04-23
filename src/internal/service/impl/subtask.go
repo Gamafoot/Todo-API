@@ -87,9 +87,10 @@ func (s *subtaskService) Update(userId, subtaskId uint, input *domain.UpdateSubt
 	}
 
 	err = s.storage.Subtask.Update(&domain.Subtask{
-		Id:     subtaskId,
-		Name:   input.Name,
-		Status: input.Status,
+		Id:       subtaskId,
+		Name:     input.Name,
+		Status:   input.Status,
+		Archived: input.Archived,
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

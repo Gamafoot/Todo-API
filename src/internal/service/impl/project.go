@@ -80,8 +80,9 @@ func (s *projectService) Update(userId, projectId uint, input *domain.UpdateProj
 	}
 
 	err = s.storage.Project.Update(&domain.Project{
-		Id:   projectId,
-		Name: input.Name,
+		Id:       projectId,
+		Name:     input.Name,
+		Archived: input.Archived,
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

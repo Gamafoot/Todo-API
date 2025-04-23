@@ -107,6 +107,7 @@ func convertTask(task *models.Task) *domain.Task {
 		ColumnId:    task.ColumnId,
 		Name:        task.Name,
 		Status:      task.Status,
+		Archived:    task.Archived,
 		Description: task.Description,
 		Deadline:    task.Deadline,
 		CreatedAt:   task.CreatedAt,

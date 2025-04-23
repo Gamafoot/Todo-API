@@ -93,6 +93,7 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 		Name:        input.Name,
 		Description: input.Description,
 		Status:      input.Status,
+		Archived:    input.Archived,
 		Deadline:    input.Deadline,
 	})
 	if err != nil {

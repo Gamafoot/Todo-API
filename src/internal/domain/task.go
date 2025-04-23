@@ -8,6 +8,7 @@ type Task struct {
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
 	Status      bool       `json:"status"`
+	Archived    bool       `json:"archived"`
 	Deadline    *time.Time `json:"deadline"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
@@ -26,5 +27,6 @@ type UpdateTaskInput struct {
 	Name        string     `json:"name" validate:"gte=3,lte=50"`
 	Description string     `json:"description"`
 	Status      bool       `json:"status"`
+	Archived    bool       `json:"archived"`
 	Deadline    *time.Time `json:"deadline"`
 }
