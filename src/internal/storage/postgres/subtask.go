@@ -22,7 +22,7 @@ func (s *subtaskStorage) FindAll(taskId uint, page, limit int) ([]*domain.Subtas
 	offset := (page - 1) * limit
 
 	tasks := make([]*models.Subtask, 0)
-	if err := s.db.Find(&tasks, "task_id = ?", taskId).Offset(offset).Limit(limit).Error; err != nil {
+	if err := s.db.Offset(offset).Limit(limit).Find(&tasks, "task_id = ?", taskId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
@@ -34,14 +34,10 @@ func (s *subtaskStorage) FindAll(taskId uint, page, limit int) ([]*domain.Subtas
 	return resultTasks, nil
 }
 
-func (s *subtaskStorage) GetAmountPages(taskId uint, page, limit int) (int, error) {
-	var (
-		count    int64
-		offset   = (page - 1) * limit
-		subtasks = make([]*models.Subtask, 0)
-	)
+func (s *subtaskStorage) GetAmountPages(taskId uint, limit int) (int, error) {
+	var count int64
 
-	if err := s.db.Find(&subtasks, "task_id = ?", taskId).Offset(offset).Limit(limit).Count(&count).Error; err != nil {
+	if err := s.db.Model(&models.Subtask{}).Where("task_id = ?", taskId).Count(&count).Error; err != nil {
 		return 0, pkgErrors.WithStack(err)
 	}
 

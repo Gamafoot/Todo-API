@@ -27,7 +27,7 @@ func (s *projectService) FindAll(userId uint, page, limit int) ([]*domain.Projec
 		return nil, 0, err
 	}
 
-	amount, err := s.storage.Project.GetAmountPages(userId, page, limit)
+	amount, err := s.storage.Project.GetAmountPages(userId, limit)
 	if err != nil {
 		return nil, 0, err
 	}

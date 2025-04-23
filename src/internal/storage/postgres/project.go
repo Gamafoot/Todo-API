@@ -21,7 +21,7 @@ func (s *projectStorage) FindAll(userId uint, page, limit int) ([]*domain.Projec
 	offset := (page - 1) * limit
 
 	projects := make([]*models.Project, 0)
-	if err := s.db.Find(&projects, "user_id = ?", userId).Offset(offset).Limit(limit).Error; err != nil {
+	if err := s.db.Offset(offset).Limit(limit).Find(&projects, "user_id = ?", userId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
@@ -33,14 +33,10 @@ func (s *projectStorage) FindAll(userId uint, page, limit int) ([]*domain.Projec
 	return resultProjects, nil
 }
 
-func (s *projectStorage) GetAmountPages(userId uint, page, limit int) (int, error) {
-	var (
-		count    int64
-		offset   = (page - 1) * limit
-		projects = make([]*models.Project, 0)
-	)
+func (s *projectStorage) GetAmountPages(userId uint, limit int) (int, error) {
+	var count int64
 
-	if err := s.db.Find(&projects, "user_id = ?", userId).Offset(offset).Limit(limit).Count(&count).Error; err != nil {
+	if err := s.db.Model(&models.Project{}).Where("user_id = ?", userId).Count(&count).Error; err != nil {
 		return 0, pkgErrors.WithStack(err)
 	}
 

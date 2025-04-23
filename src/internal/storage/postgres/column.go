@@ -22,7 +22,7 @@ func (s *columnStorage) FindAll(projectId uint, page, limit int) ([]*domain.Colu
 	offset := (page - 1) * limit
 
 	columns := make([]*models.Column, 0)
-	if err := s.db.Find(&columns, "project_id = ?", projectId).Offset(offset).Limit(limit).Error; err != nil {
+	if err := s.db.Offset(offset).Limit(limit).Find(&columns, "project_id = ?", projectId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
@@ -34,14 +34,10 @@ func (s *columnStorage) FindAll(projectId uint, page, limit int) ([]*domain.Colu
 	return resultColumns, nil
 }
 
-func (s *columnStorage) GetAmountPages(columnId uint, page, limit int) (int, error) {
-	var (
-		count  int64
-		offset = (page - 1) * limit
-		tasks  = make([]*models.Column, 0)
-	)
+func (s *columnStorage) GetAmountPages(columnId uint, limit int) (int, error) {
+	var count int64
 
-	if err := s.db.Find(&tasks, "column_id = ?", columnId).Offset(offset).Limit(limit).Count(&count).Error; err != nil {
+	if err := s.db.Model(&models.Column{}).Where("column_id = ?", columnId).Count(&count).Error; err != nil {
 		return 0, pkgErrors.WithStack(err)
 	}
 

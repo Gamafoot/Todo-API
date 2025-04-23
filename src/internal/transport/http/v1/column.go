@@ -24,7 +24,7 @@ func (h *handler) initColumnRoutes(api *echo.Group) {
 // @Param page query int false "Номер страницы, по уполчанию 1"
 // @Param limit query int false "Кол-во итоговых записей, по уполчанию 10"
 // @Success 200 {array} domain.Column
-// @Header 200 {integer} X-Total-Count "Общее количество колонок на проекте"
+// @Header 200 {integer} X-Total-Pages "Общее количество страниц колонок на проекте"
 // @Failure 400
 // @Failure 401
 // @Router /api/v1/projects/{project_id}/columns [get]
@@ -58,8 +58,8 @@ func (h *handler) FindColumns(c echo.Context) error {
 		return err
 	}
 
-	c.Response().Header().Set("Access-Control-Expose-Headers", "X-Total-Count")
-	c.Response().Header().Set("X-Total-Count", fmt.Sprintf("%d", amount))
+	c.Response().Header().Set("Access-Control-Expose-Headers", "X-Total-Pages")
+	c.Response().Header().Set("X-Total-Pages", fmt.Sprintf("%d", amount))
 
 	return c.JSON(http.StatusOK, columns)
 }

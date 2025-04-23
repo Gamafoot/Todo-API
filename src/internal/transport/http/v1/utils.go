@@ -25,15 +25,14 @@ func getIntFromQuery(c echo.Context, param string, defaultValue ...int) (int, er
 
 	valueInt, err := strconv.Atoi(value)
 	if err != nil {
+		if len(defaultValue) > 0 {
+			return defaultValue[0], nil
+		}
 		return 0, errors.Wrap(domain.ErrNotDigit, param)
 	}
 
 	if valueInt < 0 {
 		return 0, errors.Wrap(domain.ErrNotPositiveDigit, param)
-	}
-
-	if len(defaultValue) > 0 && valueInt == 0 {
-		return defaultValue[0], nil
 	}
 
 	return valueInt, nil

@@ -80,6 +80,10 @@ definitions:
     type: object
   domain.Project:
     properties:
+      archived:
+        type: boolean
+      created_at:
+        type: string
       deadline:
         type: string
       description:
@@ -87,6 +91,8 @@ definitions:
       id:
         type: integer
       name:
+        type: string
+      updated_at:
         type: string
     type: object
   domain.RegisterInput:
@@ -110,6 +116,8 @@ definitions:
     type: object
   domain.Subtask:
     properties:
+      archived:
+        type: boolean
       created_at:
         type: string
       id:
@@ -125,6 +133,8 @@ definitions:
     type: object
   domain.Task:
     properties:
+      archived:
+        type: boolean
       column_id:
         type: integer
       created_at:
@@ -153,6 +163,8 @@ definitions:
     type: object
   domain.UpdateProjectInput:
     properties:
+      archived:
+        type: boolean
       deadline:
         type: string
       description:
@@ -166,6 +178,8 @@ definitions:
     type: object
   domain.UpdateTaskInput:
     properties:
+      archived:
+        type: boolean
       column_id:
         type: integer
       deadline:
@@ -367,8 +381,8 @@ paths:
         "200":
           description: OK
           headers:
-            X-Total-Count:
-              description: Общее количество задач на колонке
+            X-Total-Pages:
+              description: Общее количество страниц задач на колонке
               type: integer
           schema:
             items:
@@ -400,8 +414,8 @@ paths:
         "200":
           description: OK
           headers:
-            X-Total-Count:
-              description: Общее количество проектов у пользователя
+            X-Total-Pages:
+              description: Общее количество страниц проектов у пользователя
               type: integer
           schema:
             items:
@@ -552,8 +566,8 @@ paths:
         "200":
           description: OK
           headers:
-            X-Total-Count:
-              description: Общее количество колонок на проекте
+            X-Total-Pages:
+              description: Общее количество страниц колонок на проекте
               type: integer
           schema:
             items:
@@ -756,8 +770,8 @@ paths:
         "200":
           description: OK
           headers:
-            X-Total-Count:
-              description: Общее количество подзадач на колонке
+            X-Total-Pages:
+              description: Общее количество страниц подзадач на колонке
               type: integer
           schema:
             items:

@@ -40,7 +40,7 @@ func (s *subtaskService) FindAll(userId, taskId uint, page, limit int) ([]*domai
 		return nil, 0, err
 	}
 
-	amount, err := s.storage.Subtask.GetAmountPages(taskId, page, limit)
+	amount, err := s.storage.Subtask.GetAmountPages(taskId, limit)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, 0, domain.ErrRecordNotFound

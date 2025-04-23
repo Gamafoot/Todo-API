@@ -305,9 +305,9 @@ const docTemplate = `{
                             }
                         },
                         "headers": {
-                            "X-Total-Count": {
+                            "X-Total-Pages": {
                                 "type": "integer",
-                                "description": "Общее количество задач на колонке"
+                                "description": "Общее количество страниц задач на колонке"
                             }
                         }
                     },
@@ -358,9 +358,9 @@ const docTemplate = `{
                             }
                         },
                         "headers": {
-                            "X-Total-Count": {
+                            "X-Total-Pages": {
                                 "type": "integer",
-                                "description": "Общее количество проектов у пользователя"
+                                "description": "Общее количество страниц проектов у пользователя"
                             }
                         }
                     },
@@ -600,9 +600,9 @@ const docTemplate = `{
                             }
                         },
                         "headers": {
-                            "X-Total-Count": {
+                            "X-Total-Pages": {
                                 "type": "integer",
-                                "description": "Общее количество колонок на проекте"
+                                "description": "Общее количество страниц колонок на проекте"
                             }
                         }
                     },
@@ -927,9 +927,9 @@ const docTemplate = `{
                             }
                         },
                         "headers": {
-                            "X-Total-Count": {
+                            "X-Total-Pages": {
                                 "type": "integer",
-                                "description": "Общее количество подзадач на колонке"
+                                "description": "Общее количество страниц подзадач на колонке"
                             }
                         }
                     },
@@ -1058,6 +1058,12 @@ const docTemplate = `{
         "domain.Project": {
             "type": "object",
             "properties": {
+                "archived": {
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string"
+                },
                 "deadline": {
                     "type": "string"
                 },
@@ -1068,6 +1074,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1100,6 +1109,9 @@ const docTemplate = `{
         "domain.Subtask": {
             "type": "object",
             "properties": {
+                "archived": {
+                    "type": "boolean"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -1123,6 +1135,9 @@ const docTemplate = `{
         "domain.Task": {
             "type": "object",
             "properties": {
+                "archived": {
+                    "type": "boolean"
+                },
                 "column_id": {
                     "type": "integer"
                 },
@@ -1168,6 +1183,9 @@ const docTemplate = `{
                 "name"
             ],
             "properties": {
+                "archived": {
+                    "type": "boolean"
+                },
                 "deadline": {
                     "type": "string"
                 },
@@ -1184,6 +1202,9 @@ const docTemplate = `{
         "domain.UpdateTaskInput": {
             "type": "object",
             "properties": {
+                "archived": {
+                    "type": "boolean"
+                },
                 "column_id": {
                     "type": "integer"
                 },

@@ -36,7 +36,7 @@ func (s *columnService) FindAll(userId, projectId uint, page, limit int) ([]*dom
 		return nil, 0, err
 	}
 
-	amount, err := s.storage.Task.GetAmountPages(userId, page, limit)
+	amount, err := s.storage.Task.GetAmountPages(userId, limit)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, 0, domain.ErrRecordNotFound

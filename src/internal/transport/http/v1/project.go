@@ -24,18 +24,18 @@ func (h *handler) initProjectRoutes(api *echo.Group) {
 // @Param page query int false "Номер страницы, по уполчанию 1"
 // @Param limit query int false "Кол-во итоговых записей, по уполчанию 10"
 // @Success 200 {array} domain.Project
-// @Header 200 {integer} X-Total-Count "Общее количество проектов у пользователя"
+// @Header 200 {integer} X-Total-Pages "Общее количество страниц проектов у пользователя"
 // @Failure 400
 // @Failure 401
 // @Failure 403
 // @Router /api/v1/projects [get]
 func (h *handler) ListProjects(c echo.Context) error {
-	page, err := getIntFromQuery(c, "page")
+	page, err := getIntFromQuery(c, "page", 1)
 	if err != nil {
 		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
-	limit, err := getIntFromQuery(c, "limit")
+	limit, err := getIntFromQuery(c, "limit", 10)
 	if err != nil {
 		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
@@ -54,8 +54,8 @@ func (h *handler) ListProjects(c echo.Context) error {
 		return err
 	}
 
-	c.Response().Header().Set("Access-Control-Expose-Headers", "X-Total-Count")
-	c.Response().Header().Set("X-Total-Count", fmt.Sprintf("%d", amount))
+	c.Response().Header().Set("Access-Control-Expose-Headers", "X-Total-Pages")
+	c.Response().Header().Set("X-Total-Pages", fmt.Sprintf("%d", amount))
 
 	return c.JSON(http.StatusOK, columns)
 }
