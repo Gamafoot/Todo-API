@@ -66,6 +66,7 @@ func (h *handler) FindTasks(c echo.Context) error {
 		return err
 	}
 
+	c.Response().Header().Set("Access-Control-Expose-Headers", "X-Total-Count")
 	c.Response().Header().Set("X-Total-Count", fmt.Sprintf("%d", amount))
 
 	return c.JSON(http.StatusOK, tasks)
