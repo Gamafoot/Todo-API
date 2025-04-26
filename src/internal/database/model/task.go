@@ -7,8 +7,8 @@ type Task struct {
 	ColumnId    uint       `gorm:"not null"`
 	Name        string     `gorm:"type:varchar(25);not null"`
 	Description string     `gorm:"type:text"`
-	Status      bool       `gorm:"default:false"`
-	Archived    bool       `gorm:"default:false"`
+	Status      *bool      `gorm:"default:false"`
+	Archived    *bool      `gorm:"default:false"`
 	Deadline    *time.Time `gorm:"type:timestamptz"`
 	CreatedAt   time.Time  `gorm:"not null"`
 	UpdatedAt   time.Time  `gorm:"not null"`
