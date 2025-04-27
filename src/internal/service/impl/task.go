@@ -132,5 +132,12 @@ func (s *taskService) Delete(userId, taskId uint) error {
 		return domain.ErrUserNotOwnedRecord
 	}
 
-	return s.storage.Task.Delete(taskId)
+	if err := s.storage.Task.Delete(taskId); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.ErrRecordNotFound
+		}
+		return err
+	}
+
+	return nil
 }

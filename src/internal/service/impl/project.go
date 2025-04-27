@@ -120,7 +120,14 @@ func (s *projectService) Delete(userId, projectId uint) error {
 		return domain.ErrUserNotOwnedRecord
 	}
 
-	return s.storage.Project.Delete(projectId)
+	if err := s.storage.Project.Delete(projectId); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.ErrRecordNotFound
+		}
+		return err
+	}
+
+	return nil
 }
 
 func (s *projectService) GetStats(userId, projectId uint) (*domain.ProjectStats, error) {

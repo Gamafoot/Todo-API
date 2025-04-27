@@ -128,5 +128,12 @@ func (s *subtaskService) Delete(userId, subtaskId uint) error {
 		return domain.ErrUserNotOwnedRecord
 	}
 
-	return s.storage.Subtask.Delete(subtaskId)
+	if err := s.storage.Subtask.Delete(subtaskId); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.ErrRecordNotFound
+		}
+		return err
+	}
+
+	return nil
 }

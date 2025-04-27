@@ -120,5 +120,12 @@ func (s *columnService) Delete(userId, columnId uint) error {
 		return domain.ErrUserNotOwnedRecord
 	}
 
-	return s.storage.Column.Delete(columnId)
+	if err = s.storage.Column.Delete(columnId); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.ErrRecordNotFound
+		}
+		return err
+	}
+
+	return nil
 }
