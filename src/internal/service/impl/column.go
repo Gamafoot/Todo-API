@@ -22,7 +22,7 @@ func NewColumnService(cfg *config.Config, storage *storage.Storage) *columnServi
 }
 
 func (s *columnService) List(userId, projectId uint, page, limit int) ([]*domain.Column, int, error) {
-	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -48,7 +48,7 @@ func (s *columnService) List(userId, projectId uint, page, limit int) ([]*domain
 }
 
 func (s *columnService) Create(userId uint, input *domain.CreateColumnInput) (*domain.Column, error) {
-	ok, err := s.storage.Project.IsOwnedUser(userId, input.ProjectId)
+	ok, err := s.storage.Project.IsOwned(userId, input.ProjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (s *columnService) Create(userId uint, input *domain.CreateColumnInput) (*d
 }
 
 func (s *columnService) Update(userId, columnId uint, input *domain.UpdateColumnInput) (*domain.Column, error) {
-	ok, err := s.storage.Column.IsOwnedUser(userId, columnId)
+	ok, err := s.storage.Column.IsOwned(userId, columnId)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *columnService) Update(userId, columnId uint, input *domain.UpdateColumn
 }
 
 func (s *columnService) Delete(userId, columnId uint) error {
-	ok, err := s.storage.Column.IsOwnedUser(userId, columnId)
+	ok, err := s.storage.Column.IsOwned(userId, columnId)
 	if err != nil {
 		return err
 	}

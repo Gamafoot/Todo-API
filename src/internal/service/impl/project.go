@@ -36,7 +36,7 @@ func (s *projectService) List(userId uint, page, limit int) ([]*domain.Project, 
 }
 
 func (s *projectService) Detail(userId, projectId uint) (*domain.Project, error) {
-	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *projectService) Create(userId uint, input *domain.CreateProjectInput) (
 }
 
 func (s *projectService) Update(userId, projectId uint, input *domain.UpdateProjectInput) (*domain.Project, error) {
-	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *projectService) Update(userId, projectId uint, input *domain.UpdateProj
 }
 
 func (s *projectService) Delete(userId, projectId uint) error {
-	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
 	if err != nil {
 		return err
 	}

@@ -9,5 +9,5 @@ type ProjectStorage interface {
 	Create(project *domain.Project) (uint, error)
 	Update(project *domain.Project) error
 	Delete(projectId uint) error
-	IsOwnedUser(userId, projectId uint) (bool, error)
+	IsOwned(userId, projectId uint) (bool, error)
 }

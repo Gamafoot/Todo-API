@@ -9,5 +9,5 @@ type ColumnStorage interface {
 	Create(column *domain.Column) (uint, error)
 	Update(column *domain.Column) error
 	Delete(columnId uint) error
-	IsOwnedUser(userId, columnId uint) (bool, error)
+	IsOwned(userId, columnId uint) (bool, error)
 }

@@ -76,23 +76,15 @@ func (s *projectStorage) Delete(id uint) error {
 	return nil
 }
 
-func (s *projectStorage) IsOwnedUser(userId, projectId uint) (bool, error) {
-	project := new(model.Project)
+func (s *projectStorage) IsOwned(userId, projectId uint) (bool, error) {
+	var isOwned bool
 
-	err := s.db.
-		Joins("JOIN users ON users.id = projects.user_id").
-		Where("users.id = ? AND projects.id = ?", userId, projectId).
-		First(project).
-		Error
-
+	err := s.db.Raw("SELECT is_owned_project(?, ?)", userId, projectId).Scan(&isOwned).Error
 	if err != nil {
-		if pkgErrors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil
-		}
 		return false, err
 	}
 
-	return true, nil
+	return isOwned, nil
 }
 
 func toDomainProject(project *model.Project) *domain.Project {

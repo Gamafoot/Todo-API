@@ -22,7 +22,7 @@ func NewTaskService(cfg *config.Config, storage *storage.Storage) *taskService {
 }
 
 func (s *taskService) List(userId, columnId uint, page, limit int) ([]*domain.Task, int, error) {
-	ok, err := s.storage.Column.IsOwnedUser(userId, columnId)
+	ok, err := s.storage.Column.IsOwned(userId, columnId)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -53,7 +53,7 @@ func (s *taskService) List(userId, columnId uint, page, limit int) ([]*domain.Ta
 }
 
 func (s *taskService) Create(userId uint, input *domain.CreateTaskInput) (*domain.Task, error) {
-	ok, err := s.storage.Column.IsOwnedUser(userId, input.ColumnId)
+	ok, err := s.storage.Column.IsOwned(userId, input.ColumnId)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (s *taskService) Create(userId uint, input *domain.CreateTaskInput) (*domai
 }
 
 func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput) (*domain.Task, error) {
-	ok, err := s.storage.Task.IsOwnedUser(userId, taskId)
+	ok, err := s.storage.Task.IsOwned(userId, taskId)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 }
 
 func (s *taskService) Delete(userId, taskId uint) error {
-	ok, err := s.storage.Task.IsOwnedUser(userId, taskId)
+	ok, err := s.storage.Task.IsOwned(userId, taskId)
 	if err != nil {
 		return err
 	}

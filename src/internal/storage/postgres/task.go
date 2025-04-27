@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"errors"
 	"math"
 	"root/internal/database/model"
 	"root/internal/domain"
@@ -77,25 +76,15 @@ func (s *taskStorage) Delete(taskId uint) error {
 	return nil
 }
 
-func (s *taskStorage) IsOwnedUser(userId, taskId uint) (bool, error) {
-	task := new(model.Task)
+func (s *taskStorage) IsOwned(userId, taskId uint) (bool, error) {
+	var isOwned bool
 
-	err := s.db.
-		Joins("JOIN columns ON columns.id = tasks.column_id").
-		Joins("JOIN projects ON projects.id = columns.project_id").
-		Joins("JOIN users ON users.id = projects.user_id").
-		Where("tasks.id = ? AND users.id = ?", taskId, userId).
-		First(task).
-		Error
-
+	err := s.db.Raw("SELECT is_owned_task(?, ?)", userId, taskId).Scan(&isOwned).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil
-		}
 		return false, err
 	}
 
-	return true, nil
+	return isOwned, nil
 }
 
 func toDomainTask(task *model.Task) *domain.Task {
