@@ -81,7 +81,7 @@ func (s *subtaskStorage) IsOwned(userId, subtaskId uint) (bool, error) {
 
 	err := s.db.Raw("SELECT is_owned_subtask(?, ?)", userId, subtaskId).Scan(&isOwned).Error
 	if err != nil {
-		return false, err
+		return false, pkgErrors.WithStack(err)
 	}
 
 	return isOwned, nil

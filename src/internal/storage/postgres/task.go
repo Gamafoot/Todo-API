@@ -81,7 +81,7 @@ func (s *taskStorage) IsOwned(userId, taskId uint) (bool, error) {
 
 	err := s.db.Raw("SELECT is_owned_task(?, ?)", userId, taskId).Scan(&isOwned).Error
 	if err != nil {
-		return false, err
+		return false, pkgErrors.WithStack(err)
 	}
 
 	return isOwned, nil

@@ -122,3 +122,16 @@ func (s *projectService) Delete(userId, projectId uint) error {
 
 	return s.storage.Project.Delete(projectId)
 }
+
+func (s *projectService) GetStats(userId, projectId uint) (*domain.ProjectStats, error) {
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, domain.ErrUserNotOwnedRecord
+	}
+
+	return s.storage.Project.GetStats(projectId)
+}

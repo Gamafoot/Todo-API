@@ -10,4 +10,10 @@ type ProjectStorage interface {
 	Update(project *domain.Project) error
 	Delete(projectId uint) error
 	IsOwned(userId, projectId uint) (bool, error)
+
+	ProjectStatsStorage
+}
+
+type ProjectStatsStorage interface {
+	GetStats(projectId uint) (*domain.ProjectStats, error)
 }

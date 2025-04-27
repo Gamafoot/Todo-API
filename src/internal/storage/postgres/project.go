@@ -81,10 +81,34 @@ func (s *projectStorage) IsOwned(userId, projectId uint) (bool, error) {
 
 	err := s.db.Raw("SELECT is_owned_project(?, ?)", userId, projectId).Scan(&isOwned).Error
 	if err != nil {
-		return false, err
+		return false, pkgErrors.WithStack(err)
 	}
 
 	return isOwned, nil
+}
+
+func (s *projectStorage) GetStats(projectId uint) (*domain.ProjectStats, error) {
+	var (
+		total     int64
+		completed int64
+	)
+
+	temp := s.db.Model(model.Task{}).Joins("INNER JOIN columns ON columns.id = tasks.column_id")
+
+	err := temp.Where("columns.project_id = ?", projectId).Count(&total).Error
+	if err != nil {
+		return nil, pkgErrors.WithStack(err)
+	}
+
+	err = temp.Where("columns.project_id = ? AND tasks.status = true", projectId).Count(&completed).Error
+	if err != nil {
+		return nil, pkgErrors.WithStack(err)
+	}
+
+	return &domain.ProjectStats{
+		Total:     int(total),
+		Completed: int(completed),
+	}, nil
 }
 
 func toDomainProject(project *model.Project) *domain.Project {

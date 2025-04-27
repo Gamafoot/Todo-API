@@ -10,4 +10,10 @@ type ProjectService interface {
 	Create(userId uint, input *domain.CreateProjectInput) (*domain.Project, error)
 	Update(userId, projectId uint, input *domain.UpdateProjectInput) (*domain.Project, error)
 	Delete(userId, projectId uint) error
+
+	ProjectStatsService
+}
+
+type ProjectStatsService interface {
+	GetStats(userId, projectId uint) (*domain.ProjectStats, error)
 }

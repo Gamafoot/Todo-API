@@ -82,7 +82,7 @@ func (s *columnStorage) IsOwned(userId, columnId uint) (bool, error) {
 
 	err := s.db.Raw("SELECT is_owned_column(?, ?)", userId, columnId).Scan(&isOwned).Error
 	if err != nil {
-		return false, err
+		return false, pkgErrors.WithStack(err)
 	}
 
 	return isOwned, nil

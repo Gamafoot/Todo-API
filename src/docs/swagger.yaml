@@ -89,6 +89,13 @@ definitions:
       updated_at:
         type: string
     type: object
+  domain.ProjectStats:
+    properties:
+      completed:
+        type: integer
+      total:
+        type: integer
+    type: object
   domain.RegisterInput:
     properties:
       password:
@@ -576,6 +583,30 @@ paths:
       summary: Список колонок
       tags:
       - column
+  /api/v1/projects/{project_id}/stats:
+    get:
+      parameters:
+      - description: ID проекта
+        in: path
+        name: project_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ProjectStats'
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+      security:
+      - BearerAuth: []
+      summary: Статистика проекта
+      tags:
+      - project
   /api/v1/subtasks:
     post:
       consumes:
