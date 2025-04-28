@@ -106,7 +106,7 @@ func (s *projectStorage) GetStats(projectId uint) (*domain.ProjectStats, error) 
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	err = temp.Where("columns.project_id = ? AND AND tasks.status = false AND tasks.deadline < NOW()", projectId).Count(&overdue).Error
+	err = temp.Where("columns.project_id = ? AND tasks.status = false AND tasks.deadline < (now() AT TIME ZONE 'UTC')", projectId).Count(&overdue).Error
 	if err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
