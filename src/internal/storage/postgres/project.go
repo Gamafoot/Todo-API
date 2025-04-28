@@ -91,6 +91,7 @@ func (s *projectStorage) GetStats(projectId uint) (*domain.ProjectStats, error) 
 	var (
 		total     int64
 		completed int64
+		overdue   int64
 	)
 
 	temp := s.db.Model(model.Task{}).Joins("INNER JOIN columns ON columns.id = tasks.column_id")
@@ -105,9 +106,15 @@ func (s *projectStorage) GetStats(projectId uint) (*domain.ProjectStats, error) 
 		return nil, pkgErrors.WithStack(err)
 	}
 
+	err = temp.Where("columns.project_id = ? AND AND tasks.status = false AND tasks.deadline < NOW()", projectId).Count(&overdue).Error
+	if err != nil {
+		return nil, pkgErrors.WithStack(err)
+	}
+
 	return &domain.ProjectStats{
 		Total:     int(total),
 		Completed: int(completed),
+		Overdue:   int(overdue),
 	}, nil
 }
 
