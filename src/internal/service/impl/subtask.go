@@ -22,7 +22,7 @@ func NewSubtaskService(cfg *config.Config, storage *storage.Storage) *subtaskSer
 }
 
 func (s *subtaskService) List(userId, taskId uint, page, limit int) ([]*domain.Subtask, int, error) {
-	ok, err := s.storage.Task.IsOwnedUser(userId, taskId)
+	ok, err := s.storage.Task.IsOwned(userId, taskId)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -53,7 +53,7 @@ func (s *subtaskService) List(userId, taskId uint, page, limit int) ([]*domain.S
 }
 
 func (s *subtaskService) Create(userId uint, input *domain.CreateSubtaskInput) (*domain.Subtask, error) {
-	ok, err := s.storage.Task.IsOwnedUser(userId, input.TaskId)
+	ok, err := s.storage.Task.IsOwned(userId, input.TaskId)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (s *subtaskService) Create(userId uint, input *domain.CreateSubtaskInput) (
 }
 
 func (s *subtaskService) Update(userId, subtaskId uint, input *domain.UpdateSubtaskInput) (*domain.Subtask, error) {
-	ok, err := s.storage.Subtask.IsOwnedUser(userId, subtaskId)
+	ok, err := s.storage.Subtask.IsOwned(userId, subtaskId)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (s *subtaskService) Update(userId, subtaskId uint, input *domain.UpdateSubt
 }
 
 func (s *subtaskService) Delete(userId, subtaskId uint) error {
-	ok, err := s.storage.Subtask.IsOwnedUser(userId, subtaskId)
+	ok, err := s.storage.Subtask.IsOwned(userId, subtaskId)
 	if err != nil {
 		return err
 	}
@@ -128,5 +128,12 @@ func (s *subtaskService) Delete(userId, subtaskId uint) error {
 		return domain.ErrUserNotOwnedRecord
 	}
 
-	return s.storage.Subtask.Delete(subtaskId)
+	if err := s.storage.Subtask.Delete(subtaskId); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.ErrRecordNotFound
+		}
+		return err
+	}
+
+	return nil
 }

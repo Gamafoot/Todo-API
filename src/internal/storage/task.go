@@ -11,5 +11,5 @@ type TaskStorage interface {
 	Create(task *domain.Task) (uint, error)
 	Update(task *domain.Task) error
 	Delete(taskId uint) error
-	IsOwnedUser(userId, taskId uint) (bool, error)
+	IsOwned(userId, taskId uint) (bool, error)
 }

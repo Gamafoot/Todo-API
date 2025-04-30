@@ -15,6 +15,7 @@ func (h *handler) initProjectRoutes(api *echo.Group) {
 	api.POST("/projects", h.CreateProject)
 	api.PATCH("/projects/:project_id", h.UpdateProject)
 	api.DELETE("/projects/:project_id", h.DeleteProject)
+	api.GET("/projects/:project_id/stats", h.ProjectStats)
 }
 
 // @Summary Список проектов
@@ -48,9 +49,8 @@ func (h *handler) ListProjects(c echo.Context) error {
 	columns, amount, err := h.service.Project.List(userId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return c.NoContent(http.StatusForbidden)
+			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 
@@ -68,7 +68,7 @@ func (h *handler) ListProjects(c echo.Context) error {
 // @Success 200 {object} domain.Project
 // @Failure 400
 // @Failure 401
-// @Failure 403
+// @Failure 404
 // @Router /api/v1/projects/{project_id} [get]
 func (h *handler) DetailProject(c echo.Context) error {
 	userId, err := getUserIdFromContext(c)
@@ -84,9 +84,8 @@ func (h *handler) DetailProject(c echo.Context) error {
 	project, err := h.service.Project.Detail(userId, projectId)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return c.NoContent(http.StatusForbidden)
+			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 
@@ -168,7 +167,6 @@ func (h *handler) UpdateProject(c echo.Context) error {
 		} else if errors.Is(err, domain.ErrRecordNotFound) {
 			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 
@@ -197,14 +195,45 @@ func (h *handler) DeleteProject(c echo.Context) error {
 		return err
 	}
 
-	err = h.service.Project.Delete(userId, projectId)
-	if err != nil {
+	if err := h.service.Project.Delete(userId, projectId); err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)
+		} else if errors.Is(err, domain.ErrRecordNotFound) {
+			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
+}
+
+// @Summary Статистика проекта
+// @Tags project
+// @Produce json
+// @Security BearerAuth
+// @Param project_id path int true "ID проекта"
+// @Success 200 {object} domain.ProjectStats
+// @Failure 401
+// @Failure 404
+// @Router /api/v1/projects/{project_id}/stats [get]
+func (h *handler) ProjectStats(c echo.Context) error {
+	userId, err := getUserIdFromContext(c)
+	if err != nil {
+		return err
+	}
+
+	projectId, err := getUIntFromParam(c, "project_id")
+	if err != nil {
+		return err
+	}
+
+	stats, err := h.service.Project.GetStats(userId, projectId)
+	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return c.NoContent(http.StatusNotFound)
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, stats)
 }

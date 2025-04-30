@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"errors"
 	"math"
 	"root/internal/database/model"
 	"root/internal/domain"
@@ -78,24 +77,15 @@ func (s *columnStorage) Delete(columnId uint) error {
 	return nil
 }
 
-func (s *columnStorage) IsOwnedUser(userId, columnId uint) (bool, error) {
-	column := new(model.Column)
+func (s *columnStorage) IsOwned(userId, columnId uint) (bool, error) {
+	var isOwned bool
 
-	err := s.db.
-		Joins("JOIN projects ON projects.id = columns.project_id").
-		Joins("JOIN users ON users.id = projects.user_id").
-		Where("columns.id = ? AND users.id = ?", columnId, userId).
-		First(column).
-		Error
-
+	err := s.db.Raw("SELECT is_owned_column(?, ?)", userId, columnId).Scan(&isOwned).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil
-		}
-		return false, err
+		return false, pkgErrors.WithStack(err)
 	}
 
-	return true, nil
+	return isOwned, nil
 }
 
 func toDomainColumn(column *model.Column) *domain.Column {

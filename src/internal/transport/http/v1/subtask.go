@@ -51,7 +51,7 @@ func (h *handler) ListSubtasks(c echo.Context) error {
 	tasks, amount, err := h.service.Subtask.List(userId, taskId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return c.NoContent(http.StatusForbidden)
+			return c.NoContent(http.StatusNotFound)
 		}
 
 		return err
@@ -91,7 +91,7 @@ func (h *handler) CreateSubtask(c echo.Context) error {
 	subtask, err := h.service.Subtask.Create(userId, input)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return c.NoContent(http.StatusForbidden)
+			return c.NoContent(http.StatusNotFound)
 		}
 
 		return err
@@ -136,7 +136,7 @@ func (h *handler) UpdateSubtask(c echo.Context) error {
 	task, err := h.service.Subtask.Update(userId, subtaskId, input)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
-			return c.NoContent(http.StatusForbidden)
+			return c.NoContent(http.StatusNotFound)
 		} else if errors.Is(err, domain.ErrRecordNotFound) {
 			return c.NoContent(http.StatusNotFound)
 		}
@@ -170,8 +170,9 @@ func (h *handler) DeleteSubtask(c echo.Context) error {
 	if err = h.service.Subtask.Delete(userId, subtaskId); err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)
+		} else if errors.Is(err, domain.ErrRecordNotFound) {
+			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 

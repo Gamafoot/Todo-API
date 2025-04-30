@@ -76,23 +76,51 @@ func (s *projectStorage) Delete(id uint) error {
 	return nil
 }
 
-func (s *projectStorage) IsOwnedUser(userId, projectId uint) (bool, error) {
-	project := new(model.Project)
+func (s *projectStorage) IsOwned(userId, projectId uint) (bool, error) {
+	var isOwned bool
 
-	err := s.db.
-		Joins("JOIN users ON users.id = projects.user_id").
-		Where("users.id = ? AND projects.id = ?", userId, projectId).
-		First(project).
-		Error
-
+	err := s.db.Raw("SELECT is_owned_project(?, ?)", userId, projectId).Scan(&isOwned).Error
 	if err != nil {
-		if pkgErrors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil
-		}
-		return false, err
+		return false, pkgErrors.WithStack(err)
 	}
 
-	return true, nil
+	return isOwned, nil
+}
+
+type A struct {
+	Count int64
+}
+
+func (s *projectStorage) GetStats(projectId uint) (*domain.ProjectStats, error) {
+	var (
+		total     int64
+		completed int64
+		overdue   int64
+	)
+
+	query := s.db.Model(model.Task{}).Joins("INNER JOIN columns ON columns.id = tasks.column_id")
+	err := query.Where("columns.project_id = ?", projectId).Count(&total).Error
+	if err != nil {
+		return nil, pkgErrors.WithStack(err)
+	}
+
+	query = s.db.Model(model.Task{}).Joins("INNER JOIN columns ON columns.id = tasks.column_id")
+	err = query.Where("columns.project_id = ? AND tasks.status = true", projectId).Count(&completed).Error
+	if err != nil {
+		return nil, pkgErrors.WithStack(err)
+	}
+
+	query = s.db.Model(model.Task{}).Joins("INNER JOIN columns ON columns.id = tasks.column_id")
+	err = query.Where("columns.project_id = ? AND tasks.deadline < (now() AT TIME ZONE 'UTC')", projectId).Count(&overdue).Error
+	if err != nil {
+		return nil, pkgErrors.WithStack(err)
+	}
+
+	return &domain.ProjectStats{
+		Total:     int(total),
+		Completed: int(completed),
+		Overdue:   int(overdue),
+	}, nil
 }
 
 func toDomainProject(project *model.Project) *domain.Project {

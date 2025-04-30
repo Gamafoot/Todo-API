@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"errors"
 	"math"
 	"root/internal/database/model"
 	"root/internal/domain"
@@ -77,26 +76,15 @@ func (s *subtaskStorage) Delete(subtaskId uint) error {
 	return nil
 }
 
-func (s *subtaskStorage) IsOwnedUser(userId, taskId uint) (bool, error) {
-	subtask := new(model.Subtask)
+func (s *subtaskStorage) IsOwned(userId, subtaskId uint) (bool, error) {
+	var isOwned bool
 
-	err := s.db.
-		Joins("JOIN tasks ON tasks.id = subtasks.task_id").
-		Joins("JOIN columns ON columns.id = tasks.column_id").
-		Joins("JOIN projects ON projects.id = columns.project_id").
-		Joins("JOIN users ON users.id = projects.user_id").
-		Where("subtasks.id = ? AND users.id = ?", taskId, userId).
-		First(subtask).
-		Error
-
+	err := s.db.Raw("SELECT is_owned_subtask(?, ?)", userId, subtaskId).Scan(&isOwned).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil
-		}
-		return false, err
+		return false, pkgErrors.WithStack(err)
 	}
 
-	return true, nil
+	return isOwned, nil
 }
 
 func toDomainSubtask(subtask *model.Subtask) *domain.Subtask {

@@ -36,7 +36,7 @@ func (s *projectService) List(userId uint, page, limit int) ([]*domain.Project, 
 }
 
 func (s *projectService) Detail(userId, projectId uint) (*domain.Project, error) {
-	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *projectService) Create(userId uint, input *domain.CreateProjectInput) (
 }
 
 func (s *projectService) Update(userId, projectId uint, input *domain.UpdateProjectInput) (*domain.Project, error) {
-	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *projectService) Update(userId, projectId uint, input *domain.UpdateProj
 }
 
 func (s *projectService) Delete(userId, projectId uint) error {
-	ok, err := s.storage.Project.IsOwnedUser(userId, projectId)
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
 	if err != nil {
 		return err
 	}
@@ -120,5 +120,25 @@ func (s *projectService) Delete(userId, projectId uint) error {
 		return domain.ErrUserNotOwnedRecord
 	}
 
-	return s.storage.Project.Delete(projectId)
+	if err := s.storage.Project.Delete(projectId); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.ErrRecordNotFound
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (s *projectService) GetStats(userId, projectId uint) (*domain.ProjectStats, error) {
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, domain.ErrUserNotOwnedRecord
+	}
+
+	return s.storage.Project.GetStats(projectId)
 }
