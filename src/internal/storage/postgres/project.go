@@ -87,6 +87,10 @@ func (s *projectStorage) IsOwned(userId, projectId uint) (bool, error) {
 	return isOwned, nil
 }
 
+type A struct {
+	Count int64
+}
+
 func (s *projectStorage) GetStats(projectId uint) (*domain.ProjectStats, error) {
 	var (
 		total     int64
@@ -94,19 +98,20 @@ func (s *projectStorage) GetStats(projectId uint) (*domain.ProjectStats, error) 
 		overdue   int64
 	)
 
-	temp := s.db.Model(model.Task{}).Joins("INNER JOIN columns ON columns.id = tasks.column_id")
-
-	err := temp.Where("columns.project_id = ?", projectId).Count(&total).Error
+	query := s.db.Model(model.Task{}).Joins("INNER JOIN columns ON columns.id = tasks.column_id")
+	err := query.Where("columns.project_id = ?", projectId).Count(&total).Error
 	if err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	err = temp.Where("columns.project_id = ? AND tasks.status = true", projectId).Count(&completed).Error
+	query = s.db.Model(model.Task{}).Joins("INNER JOIN columns ON columns.id = tasks.column_id")
+	err = query.Where("columns.project_id = ? AND tasks.status = true", projectId).Count(&completed).Error
 	if err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
-	err = temp.Where("columns.project_id = ? AND tasks.status = false AND tasks.deadline < (now() AT TIME ZONE 'UTC')", projectId).Count(&overdue).Error
+	query = s.db.Model(model.Task{}).Joins("INNER JOIN columns ON columns.id = tasks.column_id")
+	err = query.Where("columns.project_id = ? AND tasks.deadline < (now() AT TIME ZONE 'UTC')", projectId).Count(&overdue).Error
 	if err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
