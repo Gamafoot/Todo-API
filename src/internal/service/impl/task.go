@@ -98,6 +98,7 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 
 	err = s.storage.Task.Update(&domain.Task{
 		Id:          taskId,
+		ColumnId:    input.ColumnId,
 		Name:        input.Name,
 		Description: input.Description,
 		Status:      input.Status,
