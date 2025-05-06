@@ -54,7 +54,6 @@ func (h *handler) ListTasks(c echo.Context) error {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 
@@ -95,7 +94,6 @@ func (h *handler) CreateTask(c echo.Context) error {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 
@@ -143,7 +141,6 @@ func (h *handler) UpdateTask(c echo.Context) error {
 		} else if errors.Is(err, domain.ErrRecordNotFound) {
 			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 

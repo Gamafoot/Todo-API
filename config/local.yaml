@@ -1,0 +1,28 @@
+listen:
+  port: 8000
+
+database:
+  url: postgres://postgres:pass@localhost:5432/todo
+
+hash:
+  salt: cy@$N8f2r\g{3@)rj52
+
+jwt:
+  signing_key: o!5(U0Ixnln~p9?V|ad(^!J#sygxbECrgHg#K<-
+  access_token_ttl: 24h
+  refresh_token_ttl: 730h
+
+cors:
+  origins:
+    - "http://localhost:7000"
+    - "http://localhost:5173"
+  methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "PATCH"
+    - "DELETE"
+  headers:
+    - "Origin"
+    - "Content-Type"
+    - "Authorization"

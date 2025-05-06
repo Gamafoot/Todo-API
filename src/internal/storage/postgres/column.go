@@ -21,7 +21,7 @@ func (s *columnStorage) FindAll(projectId uint, page, limit int) ([]*domain.Colu
 	offset := (page - 1) * limit
 
 	columns := make([]*model.Column, 0)
-	if err := s.db.Offset(offset).Limit(limit).Find(&columns, "project_id = ?", projectId).Error; err != nil {
+	if err := s.db.Offset(offset).Limit(limit).Order("position").Find(&columns, "project_id = ?", projectId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
@@ -88,11 +88,20 @@ func (s *columnStorage) IsOwned(userId, columnId uint) (bool, error) {
 	return isOwned, nil
 }
 
+func (s *columnStorage) MoveToPosition(projectId, columnId uint, newPosition int) error {
+	err := s.db.Exec("SELECT columns_move_to_position(?, ?, ?);", projectId, columnId, newPosition).Error
+	if err != nil {
+		return pkgErrors.WithStack(err)
+	}
+	return nil
+}
+
 func toDomainColumn(column *model.Column) *domain.Column {
 	return &domain.Column{
 		Id:        column.Id,
 		ProjectId: column.ProjectId,
 		Name:      column.Name,
+		Position:  column.Position,
 	}
 }
 
@@ -101,5 +110,6 @@ func toModelColumn(column *domain.Column) *model.Column {
 		Id:        column.Id,
 		ProjectId: column.ProjectId,
 		Name:      column.Name,
+		Position:  column.Position,
 	}
 }

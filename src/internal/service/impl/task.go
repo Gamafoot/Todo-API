@@ -120,6 +120,14 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 		return nil, err
 	}
 
+	if input.Position > 0 {
+		err = s.storage.Task.MoveToPosition(task.ColumnId, taskId, input.Position)
+		if err != nil {
+			return nil, err
+		}
+		task.Position = input.Position
+	}
+
 	return task, nil
 }
 

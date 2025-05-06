@@ -21,7 +21,7 @@ func (s *subtaskStorage) FindAll(taskId uint, page, limit int) ([]*domain.Subtas
 	offset := (page - 1) * limit
 
 	tasks := make([]*model.Subtask, 0)
-	if err := s.db.Offset(offset).Limit(limit).Find(&tasks, "task_id = ?", taskId).Error; err != nil {
+	if err := s.db.Offset(offset).Limit(limit).Order("position").Find(&tasks, "task_id = ?", taskId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
@@ -87,6 +87,14 @@ func (s *subtaskStorage) IsOwned(userId, subtaskId uint) (bool, error) {
 	return isOwned, nil
 }
 
+func (s *subtaskStorage) MoveToPosition(taskId, subtaskId uint, newPosition int) error {
+	err := s.db.Exec("SELECT subtasks_move_to_position(?, ?, ?);", taskId, subtaskId, newPosition).Error
+	if err != nil {
+		return pkgErrors.WithStack(err)
+	}
+	return nil
+}
+
 func toDomainSubtask(subtask *model.Subtask) *domain.Subtask {
 	return &domain.Subtask{
 		Id:        subtask.Id,
@@ -94,6 +102,7 @@ func toDomainSubtask(subtask *model.Subtask) *domain.Subtask {
 		Name:      subtask.Name,
 		Status:    subtask.Status,
 		Archived:  subtask.Archived,
+		Position:  subtask.Position,
 		CreatedAt: subtask.CreatedAt,
 		UpdatedAt: subtask.UpdatedAt,
 	}
@@ -106,6 +115,7 @@ func toModelSubtask(subtask *domain.Subtask) *model.Subtask {
 		Name:      subtask.Name,
 		Status:    subtask.Status,
 		Archived:  subtask.Archived,
+		Position:  subtask.Position,
 		CreatedAt: subtask.CreatedAt,
 		UpdatedAt: subtask.UpdatedAt,
 	}

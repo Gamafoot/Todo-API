@@ -5,6 +5,8 @@ definitions:
         type: integer
       name:
         type: string
+      position:
+        type: integer
       project_id:
         type: integer
     type: object
@@ -93,6 +95,8 @@ definitions:
     properties:
       completed:
         type: integer
+      overdue:
+        type: integer
       total:
         type: integer
     type: object
@@ -125,6 +129,8 @@ definitions:
         type: integer
       name:
         type: string
+      position:
+        type: integer
       status:
         type: boolean
       task_id:
@@ -148,6 +154,8 @@ definitions:
         type: integer
       name:
         type: string
+      position:
+        type: integer
       status:
         type: boolean
       updated_at:
@@ -159,8 +167,9 @@ definitions:
         maxLength: 50
         minLength: 3
         type: string
-    required:
-    - name
+      position:
+        minimum: 1
+        type: integer
     type: object
   domain.UpdateProjectInput:
     properties:
@@ -191,6 +200,9 @@ definitions:
         maxLength: 50
         minLength: 3
         type: string
+      position:
+        minimum: 1
+        type: integer
       status:
         type: boolean
     type: object
@@ -503,8 +515,8 @@ paths:
           description: Bad Request
         "401":
           description: Unauthorized
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
       security:
       - BearerAuth: []
       summary: Детали проекта

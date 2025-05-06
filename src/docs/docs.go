@@ -454,8 +454,8 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized"
                     },
-                    "403": {
-                        "description": "Forbidden"
+                    "404": {
+                        "description": "Not Found"
                     }
                 }
             },
@@ -989,6 +989,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "position": {
+                    "type": "integer"
+                },
                 "project_id": {
                     "type": "integer"
                 }
@@ -1118,6 +1121,9 @@ const docTemplate = `{
                 "completed": {
                     "type": "integer"
                 },
+                "overdue": {
+                    "type": "integer"
+                },
                 "total": {
                     "type": "integer"
                 }
@@ -1163,6 +1169,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "position": {
+                    "type": "integer"
+                },
                 "status": {
                     "type": "boolean"
                 },
@@ -1198,6 +1207,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "position": {
+                    "type": "integer"
+                },
                 "status": {
                     "type": "boolean"
                 },
@@ -1208,14 +1220,15 @@ const docTemplate = `{
         },
         "domain.UpdateColumnInput": {
             "type": "object",
-            "required": [
-                "name"
-            ],
             "properties": {
                 "name": {
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
+                },
+                "position": {
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         },
@@ -1260,6 +1273,10 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
+                },
+                "position": {
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "status": {
                     "type": "boolean"

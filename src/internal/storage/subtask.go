@@ -12,4 +12,5 @@ type SubtaskStorage interface {
 	Update(subtask *domain.Subtask) error
 	Delete(subtaskId uint) error
 	IsOwned(userId, subtaskId uint) (bool, error)
+	MoveToPosition(taskId, subtaskId uint, newPosition int) error
 }

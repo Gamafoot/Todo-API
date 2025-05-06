@@ -115,6 +115,14 @@ func (s *subtaskService) Update(userId, subtaskId uint, input *domain.UpdateSubt
 		return nil, err
 	}
 
+	if input.Position > 0 {
+		err = s.storage.Subtask.MoveToPosition(subtask.TaskId, subtaskId, input.Position)
+		if err != nil {
+			return nil, err
+		}
+		subtask.Position = input.Position
+	}
+
 	return subtask, nil
 }
 

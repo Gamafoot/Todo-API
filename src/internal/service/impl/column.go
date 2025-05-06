@@ -107,6 +107,14 @@ func (s *columnService) Update(userId, columnId uint, input *domain.UpdateColumn
 		return nil, err
 	}
 
+	if input.Position > 0 {
+		err = s.storage.Column.MoveToPosition(column.ProjectId, columnId, input.Position)
+		if err != nil {
+			return nil, err
+		}
+		column.Position = input.Position
+	}
+
 	return column, nil
 }
 

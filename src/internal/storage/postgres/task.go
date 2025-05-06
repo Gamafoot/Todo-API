@@ -21,7 +21,7 @@ func (s *taskStorage) FindAll(columnId uint, page, limit int) ([]*domain.Task, e
 	offset := (page - 1) * limit
 
 	tasks := make([]*model.Task, 0)
-	if err := s.db.Offset(offset).Limit(limit).Find(&tasks, "column_id = ?", columnId).Error; err != nil {
+	if err := s.db.Offset(offset).Limit(limit).Order("position").Find(&tasks, "column_id = ?", columnId).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
@@ -87,6 +87,14 @@ func (s *taskStorage) IsOwned(userId, taskId uint) (bool, error) {
 	return isOwned, nil
 }
 
+func (s *taskStorage) MoveToPosition(columnId, taskId uint, newPosition int) error {
+	err := s.db.Exec("SELECT tasks_move_to_position(?, ?, ?);", columnId, taskId, newPosition).Error
+	if err != nil {
+		return pkgErrors.WithStack(err)
+	}
+	return nil
+}
+
 func toDomainTask(task *model.Task) *domain.Task {
 	return &domain.Task{
 		Id:          task.Id,
@@ -94,6 +102,7 @@ func toDomainTask(task *model.Task) *domain.Task {
 		Name:        task.Name,
 		Status:      task.Status,
 		Archived:    task.Archived,
+		Position:    task.Position,
 		Description: task.Description,
 		Deadline:    task.Deadline,
 		CreatedAt:   task.CreatedAt,
@@ -108,6 +117,7 @@ func toModelTask(task *domain.Task) *model.Task {
 		Name:        task.Name,
 		Status:      task.Status,
 		Archived:    task.Archived,
+		Position:    task.Position,
 		Description: task.Description,
 		Deadline:    task.Deadline,
 		CreatedAt:   task.CreatedAt,

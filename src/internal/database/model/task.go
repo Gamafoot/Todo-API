@@ -10,6 +10,7 @@ type Task struct {
 	Status      *bool      `gorm:"default:false"`
 	CompletedAt *time.Time `gorm:"default:null"`
 	Archived    *bool      `gorm:"default:false"`
+	Position    int
 	Deadline    *time.Time `gorm:"type:timestamptz"`
 	CreatedAt   time.Time  `gorm:"not null"`
 	UpdatedAt   time.Time  `gorm:"not null"`

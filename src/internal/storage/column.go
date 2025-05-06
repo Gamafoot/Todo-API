@@ -10,4 +10,5 @@ type ColumnStorage interface {
 	Update(column *domain.Column) error
 	Delete(columnId uint) error
 	IsOwned(userId, columnId uint) (bool, error)
+	MoveToPosition(projectId, columnId uint, newPosition int) error
 }
