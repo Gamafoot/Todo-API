@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"root/internal/config"
@@ -26,21 +27,31 @@ func main() {
 		log.Fatalf("Failed to create all tables: %+v\n", err)
 	}
 
-	scripts, err := getMigrationScripts()
+	scripts, err := getSqlScripts("functions")
 	if err != nil {
-		log.Fatalf("Failed get migration scripts: %+v\n", err)
+		log.Fatalf("Failed get function scripts: %+v\n", err)
 	}
 
 	err = executeScripts(db, scripts)
 	if err != nil {
-		log.Fatalf("Failed to execute scripts: %+v\n", err)
+		log.Fatalf("Failed to execute functions: %+v\n", err)
+	}
+
+	scripts, err = getSqlScripts("triggers")
+	if err != nil {
+		log.Fatalf("Failed get trigger scripts: %+v\n", err)
+	}
+
+	err = executeScripts(db, scripts)
+	if err != nil {
+		log.Fatalf("Failed to execute triggers: %+v\n", err)
 	}
 
 	log.Println("Migrate was successed")
 }
 
-func getMigrationScripts() (map[string]string, error) {
-	rootDir := "assets/migration/"
+func getSqlScripts(folderName string) (map[string]string, error) {
+	rootDir := fmt.Sprintf("assets/migration/%s/", folderName)
 
 	scripts := make(map[string]string)
 
