@@ -1,10 +1,6 @@
 CREATE OR REPLACE FUNCTION public.tg_tasks_fix_positions_after_delete()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE tasks
-    SET position = position - 1
-    WHERE column_id = OLD.column_id
-    AND position > OLD.position;
-    RETURN OLD;
+    PERFORM public.tasks_fix_positions_after_delete(OLD.column_id, OLD.position);
 END;
 $$ LANGUAGE plpgsql;

@@ -1,8 +1,6 @@
 CREATE OR REPLACE FUNCTION public.tg_tasks_set_default_position()
 RETURNS TRIGGER AS $$
 BEGIN
-    SELECT COUNT(*) + 1 INTO NEW.position FROM tasks 
-    WHERE column_id = NEW.column_id AND archived = false;
-    RETURN NEW;
+    PERFORM public.tasks_set_default_position(NEW.column_id, NEW.id);
 END;
 $$ LANGUAGE plpgsql;

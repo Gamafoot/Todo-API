@@ -1,0 +1,25 @@
+CREATE OR REPLACE FUNCTION public.tasks_move_to_column(
+    p_new_column_id integer,
+    p_task_id integer,
+    p_new_position integer
+)
+RETURNS VOID AS $$
+DECLARE
+    v_old_column_id integer;
+BEGIN
+    SELECT column_id INTO v_old_column_id FROM tasks
+    WHERE id = p_task_id;
+
+    IF v_old_column_id = p_new_column_id THEN
+        RETURN;
+    END IF;
+
+    PERFORM public.tasks_set_default_position(p_new_column_id, p_task_id);
+    
+    UPDATE tasks SET column_id = p_new_column_id
+    WHERE id = p_task_id;
+
+    PERFORM public.tasks_move_to_position(p_new_column_id, p_task_id, p_new_position);
+    PERFORM public.tasks_fix_positions_after_delete(v_old_column_id, p_task_id);
+END;
+$$ LANGUAGE plpgsql;

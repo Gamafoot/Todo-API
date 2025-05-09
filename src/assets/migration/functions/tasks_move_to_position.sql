@@ -6,11 +6,10 @@ CREATE OR REPLACE FUNCTION public.tasks_move_to_position(
 RETURNS VOID AS $$
 DECLARE
     v_current_position INT;
-    v_current_archived BOOLEAN;
     v_max_position INT;
 BEGIN
     -- Получаем текущее состояние задачи
-    SELECT position, archived INTO v_current_position, v_current_archived
+    SELECT position INTO v_current_position
     FROM tasks 
     WHERE id = p_task_id AND column_id = p_column_id;
     
@@ -24,12 +23,12 @@ BEGIN
     END IF;
     
     -- Получаем максимальную позицию для соответствующего архивированного статуса
-    SELECT COALESCE(MAX(position), 0) INTO v_max_position
+    SELECT COALESCE(MAX(position), 1) INTO v_max_position
     FROM tasks 
-    WHERE column_id = p_column_id AND archived = v_current_archived;
+    WHERE column_id = p_column_id;
     
     -- Корректируем позицию если она выходит за пределы
-    p_new_position := GREATEST(1, LEAST(p_new_position, v_max_position + 1));
+    p_new_position := LEAST(p_new_position, v_max_position);
     
     -- Обновляем позиции только среди задач с тем же архивным статусом
     IF p_new_position < v_current_position THEN
@@ -37,7 +36,6 @@ BEGIN
         UPDATE tasks
         SET position = position + 1
         WHERE column_id = p_column_id
-          AND archived = v_current_archived
           AND position >= p_new_position
           AND position < v_current_position;
     ELSE
@@ -45,7 +43,6 @@ BEGIN
         UPDATE tasks
         SET position = position - 1
         WHERE column_id = p_column_id
-          AND archived = v_current_archived
           AND position > v_current_position
           AND position <= p_new_position;
     END IF;
