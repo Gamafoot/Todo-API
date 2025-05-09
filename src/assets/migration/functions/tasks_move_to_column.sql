@@ -6,8 +6,9 @@ CREATE OR REPLACE FUNCTION public.tasks_move_to_column(
 RETURNS VOID AS $$
 DECLARE
     v_old_column_id integer;
+    v_old_position integer;
 BEGIN
-    SELECT column_id INTO v_old_column_id FROM tasks
+    SELECT column_id, position INTO v_old_column_id, v_old_position FROM tasks
     WHERE id = p_task_id;
 
     IF v_old_column_id = p_new_column_id THEN
@@ -20,6 +21,6 @@ BEGIN
     WHERE id = p_task_id;
 
     PERFORM public.tasks_move_to_position(p_new_column_id, p_task_id, p_new_position);
-    PERFORM public.tasks_fix_positions_after_delete(v_old_column_id, p_task_id);
+    PERFORM public.tasks_fix_positions_after_delete(v_old_column_id, v_old_position);
 END;
 $$ LANGUAGE plpgsql;
