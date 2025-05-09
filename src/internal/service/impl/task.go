@@ -119,7 +119,7 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 		return nil, err
 	}
 
-	if input.ColumnId > 0 {
+	if input.ColumnId > 0 && task.ColumnId != input.ColumnId {
 		if input.Position <= 0 {
 			input.Position = 1
 		}
