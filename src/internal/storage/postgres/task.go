@@ -87,6 +87,14 @@ func (s *taskStorage) IsOwned(userId, taskId uint) (bool, error) {
 	return isOwned, nil
 }
 
+func (s *taskStorage) MoveToColumn(columnId, taskId uint, newPosition int) error {
+	err := s.db.Exec("SELECT tasks_move_to_column(?, ?, ?);", columnId, taskId, newPosition).Error
+	if err != nil {
+		return pkgErrors.WithStack(err)
+	}
+	return nil
+}
+
 func (s *taskStorage) MoveToPosition(columnId, taskId uint, newPosition int) error {
 	err := s.db.Exec("SELECT tasks_move_to_position(?, ?, ?);", columnId, taskId, newPosition).Error
 	if err != nil {

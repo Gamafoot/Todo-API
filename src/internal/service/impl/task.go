@@ -98,7 +98,6 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 
 	err = s.storage.Task.Update(&domain.Task{
 		Id:          taskId,
-		ColumnId:    input.ColumnId,
 		Name:        input.Name,
 		Description: input.Description,
 		Status:      input.Status,
@@ -120,7 +119,23 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 		return nil, err
 	}
 
-	if input.Position > 0 {
+	if input.ColumnId > 0 {
+		if input.Position <= 0 {
+			input.Position = 1
+		}
+
+		err = s.storage.Task.MoveToColumn(input.ColumnId, taskId, input.Position)
+		if err != nil {
+			return nil, err
+		}
+
+		task.ColumnId = input.ColumnId
+		task.Position = input.Position
+	} else if input.Position > 0 {
+		if input.Position <= 0 {
+			input.Position = 1
+		}
+
 		err = s.storage.Task.MoveToPosition(task.ColumnId, taskId, input.Position)
 		if err != nil {
 			return nil, err

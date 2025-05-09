@@ -12,5 +12,6 @@ type TaskStorage interface {
 	Update(task *domain.Task) error
 	Delete(taskId uint) error
 	IsOwned(userId, taskId uint) (bool, error)
+	MoveToColumn(columnId, taskId uint, newPosition int) error
 	MoveToPosition(columnId, taskId uint, newPosition int) error
 }
