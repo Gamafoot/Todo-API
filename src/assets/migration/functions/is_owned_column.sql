@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.is_owned_column(
+CREATE OR REPLACE FUNCTION is_owned_column(
     p_user_id integer,
     p_column_id integer
 )

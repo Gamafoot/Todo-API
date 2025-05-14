@@ -64,6 +64,18 @@ definitions:
     - description
     - name
     type: object
+  domain.DailyStats:
+    properties:
+      data:
+        items:
+          properties:
+            count:
+              type: integer
+            hour:
+              type: integer
+          type: object
+        type: array
+    type: object
   domain.LoginInput:
     properties:
       password:
@@ -206,10 +218,46 @@ definitions:
       status:
         type: boolean
     type: object
+  domain.YearlyStats:
+    properties:
+      data:
+        items:
+          properties:
+            count:
+              type: integer
+            month:
+              type: integer
+          type: object
+        type: array
+    type: object
+  v1.monthlyStatsOutput:
+    properties:
+      data:
+        items:
+          properties:
+            count:
+              type: integer
+            day:
+              type: string
+          type: object
+        type: array
+    type: object
   v1.tokenResponse:
     properties:
       access_token:
         type: string
+    type: object
+  v1.weeklyStatsOutput:
+    properties:
+      data:
+        items:
+          properties:
+            count:
+              type: integer
+            day:
+              type: string
+          type: object
+        type: array
     type: object
 info:
   contact: {}
@@ -619,6 +667,114 @@ paths:
       summary: Статистика проекта
       tags:
       - project
+  /api/v1/stats/daily:
+    get:
+      description: Поле "date" будет брать текущую дату, если его не заполнить
+      parameters:
+      - description: 'Дата в формат: year-month-day'
+        in: query
+        name: date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.DailyStats'
+            type: array
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Статистика за день
+      tags:
+      - stats
+  /api/v1/stats/monthly:
+    get:
+      description: Поля "month" и "year" будут брать текущую дату, если они не заполнены
+      parameters:
+      - description: Месяц
+        in: query
+        name: month
+        type: integer
+      - description: Год
+        in: query
+        name: year
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/v1.monthlyStatsOutput'
+            type: array
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Статистика за месяц
+      tags:
+      - stats
+  /api/v1/stats/weekly:
+    get:
+      description: Поле "date" будет брать текущую дату, если его не заполнить
+      parameters:
+      - description: 'Дата в формат: year-month-day'
+        in: query
+        name: date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/v1.weeklyStatsOutput'
+            type: array
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Статистика за неделю
+      tags:
+      - stats
+  /api/v1/stats/yearly:
+    get:
+      description: Поле "year" будет брать текущую дату, если его не заполнить
+      parameters:
+      - description: Год
+        in: query
+        name: year
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.YearlyStats'
+            type: array
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Статистика за год
+      tags:
+      - stats
   /api/v1/subtasks:
     post:
       consumes:

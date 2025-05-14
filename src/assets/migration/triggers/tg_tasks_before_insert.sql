@@ -4,4 +4,4 @@ CREATE TRIGGER tg_tasks_before_insert
 BEFORE INSERT
 ON tasks
 FOR EACH ROW
-EXECUTE PROCEDURE public.tg_tasks_set_default_position();
+EXECUTE PROCEDURE tg_tasks_set_default_position();

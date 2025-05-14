@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.tg_tasks_update_completed_at()
+CREATE OR REPLACE FUNCTION tg_tasks_update_completed_at()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.status = TRUE AND (OLD.status IS DISTINCT FROM NEW.status) THEN

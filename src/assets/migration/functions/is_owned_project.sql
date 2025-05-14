@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.is_owned_project(
+CREATE OR REPLACE FUNCTION is_owned_project(
     p_user_id integer, 
     p_project_id integer
 )

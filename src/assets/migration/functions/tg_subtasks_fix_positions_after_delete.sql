@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.tg_subtasks_fix_positions_after_delete()
+CREATE OR REPLACE FUNCTION tg_subtasks_fix_positions_after_delete()
 RETURNS TRIGGER AS $$
 BEGIN
     UPDATE subtasks
