@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.tg_subtasks_set_default_position() 
+CREATE OR REPLACE FUNCTION tg_subtasks_set_default_position() 
 RETURNS TRIGGER AS $$
 BEGIN
     SELECT COUNT(*) + 1 INTO NEW.position FROM subtasks 

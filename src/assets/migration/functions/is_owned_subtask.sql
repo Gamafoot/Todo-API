@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.is_owned_subtask(
+CREATE OR REPLACE FUNCTION is_owned_subtask(
     p_user_id integer, 
     p_subtask_id integer
 )

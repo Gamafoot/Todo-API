@@ -4,4 +4,4 @@ CREATE TRIGGER tg_columns_after_insert
 AFTER INSERT
 ON columns
 FOR EACH ROW
-EXECUTE PROCEDURE public.tg_columns_move_to_first_position();
+EXECUTE PROCEDURE tg_columns_move_to_first_position();

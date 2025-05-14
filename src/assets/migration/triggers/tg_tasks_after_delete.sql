@@ -4,4 +4,4 @@ CREATE TRIGGER tg_tasks_after_delete
 AFTER DELETE
 ON tasks
 FOR EACH ROW
-EXECUTE PROCEDURE public.tg_tasks_fix_positions_after_delete();
+EXECUTE PROCEDURE tg_tasks_fix_positions_after_delete();

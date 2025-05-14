@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.tasks_move_to_position(
+CREATE OR REPLACE FUNCTION tasks_move_to_position(
     p_column_id integer, 
     p_task_id integer, 
     p_new_position integer

@@ -4,4 +4,4 @@ CREATE TRIGGER tg_columns_before_insert
 BEFORE INSERT
 ON columns
 FOR EACH ROW
-EXECUTE PROCEDURE public.tg_columns_set_default_position();
+EXECUTE PROCEDURE tg_columns_set_default_position();
