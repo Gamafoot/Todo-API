@@ -25,3 +25,9 @@ type UpdateProjectInput struct {
 	Archived    *bool      `json:"archived"`
 	Deadline    *time.Time `json:"deadline"`
 }
+
+type ProjectStats struct {
+	Total     int `json:"total"`
+	Completed int `json:"completed"`
+	Overdue int `json:"overdue"`
+}

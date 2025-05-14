@@ -13,6 +13,7 @@ type Service struct {
 	Column  ColumnService
 	Task    TaskService
 	Subtask SubtaskService
+	Stats   StatsService
 }
 
 func NewService(cfg *config.Config, storage *storage.Storage, tokenManager jwt.TokenManager) *Service {
@@ -22,5 +23,6 @@ func NewService(cfg *config.Config, storage *storage.Storage, tokenManager jwt.T
 		Column:  impl.NewColumnService(cfg, storage),
 		Task:    impl.NewTaskService(cfg, storage),
 		Subtask: impl.NewSubtaskService(cfg, storage),
+		Stats:   impl.NewStatsService(cfg, storage),
 	}
 }
