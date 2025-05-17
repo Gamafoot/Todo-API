@@ -346,6 +346,24 @@ const docTemplate = `{
                         "description": "Кол-во итоговых записей, по уполчанию 10",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Паттерн поиска по имени или по описанию",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Сортировка по updated_at или created_at",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Фильтрует проекты по полю archived",
+                        "name": "archived",
+                        "in": "query"
                     }
                 ],
                 "responses": {

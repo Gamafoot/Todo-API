@@ -29,5 +29,16 @@ type UpdateProjectInput struct {
 type ProjectStats struct {
 	Total     int `json:"total"`
 	Completed int `json:"completed"`
-	Overdue int `json:"overdue"`
+	Overdue   int `json:"overdue"`
+}
+
+var ProjectOrder = map[string]string{
+	"updated_at": "updated_at",
+	"created_at": "created_at",
+}
+
+type SearchProjectOptions struct {
+	Pattern  string
+	Order    string
+	Archived bool
 }

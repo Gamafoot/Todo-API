@@ -3,8 +3,7 @@ package storage
 import "root/internal/domain"
 
 type ProjectStorage interface {
-	FindAll(userId uint, page, limit int) ([]*domain.Project, error)
-	GetAmountPages(userId uint, limit int) (int, error)
+	FindAll(userId uint, options *domain.SearchProjectOptions, page, limit int) ([]*domain.Project, int, error)
 	FindById(projectId uint) (*domain.Project, error)
 	Create(project *domain.Project) (uint, error)
 	Update(project *domain.Project) error

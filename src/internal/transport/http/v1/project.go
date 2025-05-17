@@ -24,6 +24,9 @@ func (h *handler) initProjectRoutes(api *echo.Group) {
 // @Security BearerAuth
 // @Param page query int false "Номер страницы, по уполчанию 1"
 // @Param limit query int false "Кол-во итоговых записей, по уполчанию 10"
+// @Param search query string false "Паттерн поиска по имени или по описанию"
+// @Param order query string false "Сортировка по created_at"
+// @Param archived query bool false "Фильтрует проекты по полю archived"
 // @Success 200 {array} domain.Project
 // @Header 200 {integer} X-Total-Pages "Общее количество страниц проектов у пользователя"
 // @Failure 400
@@ -33,12 +36,37 @@ func (h *handler) initProjectRoutes(api *echo.Group) {
 func (h *handler) ListProjects(c echo.Context) error {
 	page, err := getIntFromQuery(c, "page", 1)
 	if err != nil {
-		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return NewErrorResponse(c, http.StatusBadRequest, "invalid page, must be digit")
 	}
 
 	limit, err := getIntFromQuery(c, "limit", 10)
 	if err != nil {
-		return NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return NewErrorResponse(c, http.StatusBadRequest, "invalid limit, must be digit")
+	}
+
+	pattern := c.QueryParam("search")
+
+	order := c.QueryParam("order")
+	if len(order) > 0 {
+		var ok bool
+
+		order, ok = domain.ProjectOrder[order]
+		if !ok {
+			return NewErrorResponse(c, http.StatusBadRequest, "invalid order, no such value")
+		}
+	} else {
+		order = "updated_at"
+	}
+
+	archived, err := getBoolFromQuery(c, "archived")
+	if err != nil {
+		return NewErrorResponse(c, http.StatusBadRequest, "invalid archived, must be boolean")
+	}
+
+	options := &domain.SearchProjectOptions{
+		Pattern:  pattern,
+		Archived: archived,
+		Order:    order,
 	}
 
 	userId, err := getUserIdFromContext(c)
@@ -46,7 +74,7 @@ func (h *handler) ListProjects(c echo.Context) error {
 		return err
 	}
 
-	columns, amount, err := h.service.Project.List(userId, page, limit)
+	columns, count, err := h.service.Project.List(userId, options, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusNotFound)
@@ -54,8 +82,10 @@ func (h *handler) ListProjects(c echo.Context) error {
 		return err
 	}
 
+	pageCount := getPageCount(count, limit)
+
 	c.Response().Header().Set("Access-Control-Expose-Headers", "X-Total-Pages")
-	c.Response().Header().Set("X-Total-Pages", fmt.Sprintf("%d", amount))
+	c.Response().Header().Set("X-Total-Pages", fmt.Sprintf("%d", pageCount))
 
 	return c.JSON(http.StatusOK, columns)
 }

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"math"
 	"root/internal/domain"
 	"strconv"
 
@@ -47,4 +48,32 @@ func getUIntFromParam(c echo.Context, param string) (uint, error) {
 	}
 
 	return uint(valueInt), nil
+}
+
+func getBoolFromQuery(c echo.Context, param string) (bool, error) {
+	value := c.QueryParam(param)
+
+	if value == "true" {
+		return true, nil
+	} else if value == "false" || len(value) == 0 {
+		return false, nil
+	}
+
+	return false, errors.New("wrong value for boolean")
+}
+
+func getStringFromQuery(c echo.Context, param string, defaultValue string) (bool, error) {
+	value := c.QueryParam(param)
+
+	if value == "true" {
+		return true, nil
+	} else if value == "false" || len(value) == 0 {
+		return false, nil
+	}
+
+	return false, errors.New("wrong value for boolean")
+}
+
+func getPageCount(count, limit int) int {
+	return int(math.Ceil(float64(count) / float64(limit)))
 }

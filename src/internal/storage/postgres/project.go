@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"math"
 	"root/internal/database/model"
 	"root/internal/domain"
 
@@ -17,12 +16,36 @@ func NewProjectStorage(db *gorm.DB) *projectStorage {
 	return &projectStorage{db: db}
 }
 
-func (s *projectStorage) FindAll(userId uint, page, limit int) ([]*domain.Project, error) {
+func (s *projectStorage) FindAll(userId uint, options *domain.SearchProjectOptions, page, limit int) ([]*domain.Project, int, error) {
 	offset := (page - 1) * limit
 
+	baseQuery := s.db.Model(model.Project{})
+	baseQuery = baseQuery.Where("user_id = ?", userId).Where("archived = ?", options.Archived)
+
+	if len(options.Pattern) > 0 {
+		pattern := options.Pattern
+		pattern = "%" + pattern + "%"
+
+		baseQuery.Where(
+			"name LIKE ? OR description LIKE ?",
+			pattern,
+			pattern,
+		)
+	}
+
+	var count int64
+
+	countQuery := baseQuery.Session(&gorm.Session{})
+	if err := countQuery.Count(&count).Error; err != nil {
+		return nil, 0, pkgErrors.WithStack(err)
+	}
+
 	projects := make([]*model.Project, 0)
-	if err := s.db.Offset(offset).Limit(limit).Find(&projects, "user_id = ?", userId).Error; err != nil {
-		return nil, pkgErrors.WithStack(err)
+
+	findQuery := baseQuery.Session(&gorm.Session{})
+	findQuery = findQuery.Offset(offset).Limit(limit).Order("updated_at desc")
+	if err := findQuery.Find(&projects).Error; err != nil {
+		return nil, 0, pkgErrors.WithStack(err)
 	}
 
 	resultProjects := make([]*domain.Project, len(projects))
@@ -30,19 +53,7 @@ func (s *projectStorage) FindAll(userId uint, page, limit int) ([]*domain.Projec
 		resultProjects[i] = toDomainProject(project)
 	}
 
-	return resultProjects, nil
-}
-
-func (s *projectStorage) GetAmountPages(userId uint, limit int) (int, error) {
-	var count int64
-
-	if err := s.db.Model(&model.Project{}).Where("user_id = ?", userId).Count(&count).Error; err != nil {
-		return 0, pkgErrors.WithStack(err)
-	}
-
-	amount := math.Ceil(float64(count) / float64(limit))
-
-	return int(amount), nil
+	return resultProjects, int(count), nil
 }
 
 func (s *projectStorage) FindById(id uint) (*domain.Project, error) {
@@ -147,4 +158,8 @@ func toModelProject(project *domain.Project) *model.Project {
 		CreatedAt:   project.CreatedAt,
 		UpdatedAt:   project.UpdatedAt,
 	}
+}
+
+func (s *projectStorage) setConditionForFindAll(db *gorm.DB) {
+
 }

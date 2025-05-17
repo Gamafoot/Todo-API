@@ -21,18 +21,8 @@ func NewProjectService(cfg *config.Config, storage *storage.Storage) *projectSer
 	}
 }
 
-func (s *projectService) List(userId uint, page, limit int) ([]*domain.Project, int, error) {
-	projects, err := s.storage.Project.FindAll(userId, page, limit)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	amount, err := s.storage.Project.GetAmountPages(userId, limit)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	return projects, amount, nil
+func (s *projectService) List(userId uint, options *domain.SearchProjectOptions, page, limit int) ([]*domain.Project, int, error) {
+	return s.storage.Project.FindAll(userId, options, page, limit)
 }
 
 func (s *projectService) Detail(userId, projectId uint) (*domain.Project, error) {
