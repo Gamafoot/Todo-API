@@ -25,7 +25,7 @@ func (h *handler) initProjectRoutes(api *echo.Group) {
 // @Param page query int false "Номер страницы, по уполчанию 1"
 // @Param limit query int false "Кол-во итоговых записей, по уполчанию 10"
 // @Param search query string false "Паттерн поиска по имени или по описанию"
-// @Param order query string false "Сортировка по created_at"
+// @Param order query string false "Сортировка по created_at (по умолчанию udpated_at)"
 // @Param archived query bool false "Фильтрует проекты по полю archived"
 // @Success 200 {array} domain.Project
 // @Header 200 {integer} X-Total-Pages "Общее количество страниц проектов у пользователя"

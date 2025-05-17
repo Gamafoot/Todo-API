@@ -355,7 +355,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Сортировка по updated_at или created_at",
+                        "description": "Сортировка по created_at (по умолчанию udpated_at)",
                         "name": "order",
                         "in": "query"
                     },
