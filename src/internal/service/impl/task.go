@@ -31,7 +31,7 @@ func (s *taskService) List(userId, columnId uint, page, limit int) ([]*domain.Ta
 		return nil, 0, domain.ErrUserNotOwnedRecord
 	}
 
-	tasks, err := s.storage.Task.FindAll(columnId, page, limit)
+	tasks, count, err := s.storage.Task.FindAll(columnId, page, limit)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, 0, domain.ErrRecordNotFound
@@ -40,16 +40,7 @@ func (s *taskService) List(userId, columnId uint, page, limit int) ([]*domain.Ta
 		return nil, 0, err
 	}
 
-	amount, err := s.storage.Task.GetAmountPages(userId, limit)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, 0, domain.ErrRecordNotFound
-		}
-
-		return nil, 0, err
-	}
-
-	return tasks, int(amount), nil
+	return tasks, count, nil
 }
 
 func (s *taskService) Create(userId uint, input *domain.CreateTaskInput) (*domain.Task, error) {

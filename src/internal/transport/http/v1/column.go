@@ -49,17 +49,18 @@ func (h *handler) ListColumns(c echo.Context) error {
 		return err
 	}
 
-	columns, amount, err := h.service.Column.List(userId, projectId, page, limit)
+	columns, count, err := h.service.Column.List(userId, projectId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)
 		}
-
 		return err
 	}
 
+	pageCount := getPageCount(count, limit)
+
 	c.Response().Header().Set("Access-Control-Expose-Headers", "X-Total-Pages")
-	c.Response().Header().Set("X-Total-Pages", fmt.Sprintf("%d", amount))
+	c.Response().Header().Set("X-Total-Pages", fmt.Sprintf("%d", pageCount))
 
 	return c.JSON(http.StatusOK, columns)
 }
@@ -95,7 +96,6 @@ func (h *handler) CreateColumn(c echo.Context) error {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusForbidden)
 		}
-
 		return err
 	}
 
@@ -143,7 +143,6 @@ func (h *handler) UpdateColumn(c echo.Context) error {
 		} else if errors.Is(err, domain.ErrRecordNotFound) {
 			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 

@@ -49,7 +49,7 @@ func (h *handler) ListTasks(c echo.Context) error {
 		return err
 	}
 
-	tasks, amount, err := h.service.Task.List(userId, columnId, page, limit)
+	tasks, count, err := h.service.Task.List(userId, columnId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusNotFound)
@@ -57,8 +57,10 @@ func (h *handler) ListTasks(c echo.Context) error {
 		return err
 	}
 
+	pageCount := getPageCount(count, limit)
+
 	c.Response().Header().Set("Access-Control-Expose-Headers", "X-Total-Pages")
-	c.Response().Header().Set("X-Total-Pages", fmt.Sprintf("%d", amount))
+	c.Response().Header().Set("X-Total-Pages", fmt.Sprintf("%d", pageCount))
 
 	return c.JSON(http.StatusOK, tasks)
 }

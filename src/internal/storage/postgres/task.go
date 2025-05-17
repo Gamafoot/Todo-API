@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"math"
 	"root/internal/database/model"
 	"root/internal/domain"
 
@@ -17,12 +16,25 @@ func NewTaskStorage(db *gorm.DB) *taskStorage {
 	return &taskStorage{db: db}
 }
 
-func (s *taskStorage) FindAll(columnId uint, page, limit int) ([]*domain.Task, error) {
+func (s *taskStorage) FindAll(columnId uint, page, limit int) ([]*domain.Task, int, error) {
 	offset := (page - 1) * limit
 
+	baseQuery := s.db.Model(model.Task{})
+	baseQuery = baseQuery.Where("column_id = ?", columnId)
+
+	var count int64
+
+	countQuery := baseQuery.Session(&gorm.Session{})
+	if err := countQuery.Count(&count).Error; err != nil {
+		return nil, 0, pkgErrors.WithStack(err)
+	}
+
 	tasks := make([]*model.Task, 0)
-	if err := s.db.Offset(offset).Limit(limit).Order("position").Find(&tasks, "column_id = ?", columnId).Error; err != nil {
-		return nil, pkgErrors.WithStack(err)
+
+	findQuery := baseQuery.Session(&gorm.Session{})
+	findQuery = findQuery.Offset(offset).Limit(limit).Order("position")
+	if err := findQuery.Find(&tasks).Error; err != nil {
+		return nil, 0, pkgErrors.WithStack(err)
 	}
 
 	resultTasks := make([]*domain.Task, len(tasks))
@@ -30,19 +42,7 @@ func (s *taskStorage) FindAll(columnId uint, page, limit int) ([]*domain.Task, e
 		resultTasks[i] = toDomainTask(task)
 	}
 
-	return resultTasks, nil
-}
-
-func (s *taskStorage) GetAmountPages(columnId uint, limit int) (int, error) {
-	var count int64
-
-	if err := s.db.Model(&model.Task{}).Where("column_id = ?", columnId).Count(&count).Error; err != nil {
-		return 0, pkgErrors.WithStack(err)
-	}
-
-	amount := math.Ceil(float64(count) / float64(limit))
-
-	return int(amount), nil
+	return resultTasks, int(count), nil
 }
 
 func (s *taskStorage) FindById(taskId uint) (*domain.Task, error) {

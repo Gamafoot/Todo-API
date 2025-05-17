@@ -31,20 +31,16 @@ func (s *columnService) List(userId, projectId uint, page, limit int) ([]*domain
 		return nil, 0, domain.ErrUserNotOwnedRecord
 	}
 
-	columns, err := s.storage.Column.FindAll(projectId, page, limit)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	amount, err := s.storage.Task.GetAmountPages(userId, limit)
+	columns, count, err := s.storage.Column.FindAll(projectId, page, limit)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, 0, domain.ErrRecordNotFound
 		}
+
 		return nil, 0, err
 	}
 
-	return columns, amount, nil
+	return columns, count, nil
 }
 
 func (s *columnService) Create(userId uint, input *domain.CreateColumnInput) (*domain.Column, error) {

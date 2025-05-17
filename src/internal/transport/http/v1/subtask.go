@@ -48,17 +48,18 @@ func (h *handler) ListSubtasks(c echo.Context) error {
 		return err
 	}
 
-	tasks, amount, err := h.service.Subtask.List(userId, taskId, page, limit)
+	tasks, count, err := h.service.Subtask.List(userId, taskId, page, limit)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 
+	pageCount := getPageCount(count, limit)
+
 	c.Response().Header().Set("Access-Control-Expose-Headers", "X-Total-Pages")
-	c.Response().Header().Set("X-Total-Pages", fmt.Sprintf("%d", amount))
+	c.Response().Header().Set("X-Total-Pages", fmt.Sprintf("%d", pageCount))
 
 	return c.JSON(http.StatusOK, tasks)
 }
@@ -93,7 +94,6 @@ func (h *handler) CreateSubtask(c echo.Context) error {
 		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
 			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 
@@ -140,7 +140,6 @@ func (h *handler) UpdateSubtask(c echo.Context) error {
 		} else if errors.Is(err, domain.ErrRecordNotFound) {
 			return c.NoContent(http.StatusNotFound)
 		}
-
 		return err
 	}
 

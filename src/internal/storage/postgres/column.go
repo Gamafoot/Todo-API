@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"math"
 	"root/internal/database/model"
 	"root/internal/domain"
 
@@ -17,12 +16,25 @@ func NewColumnStorage(db *gorm.DB) *columnStorage {
 	return &columnStorage{db: db}
 }
 
-func (s *columnStorage) FindAll(projectId uint, page, limit int) ([]*domain.Column, error) {
+func (s *columnStorage) FindAll(projectId uint, page, limit int) ([]*domain.Column, int, error) {
 	offset := (page - 1) * limit
 
+	baseQuery := s.db.Model(model.Column{})
+	baseQuery = baseQuery.Where("project_id = ?", projectId)
+
+	var count int64
+
+	find := baseQuery.Session(&gorm.Session{})
+	if err := find.Count(&count).Error; err != nil {
+		return nil, 0, pkgErrors.WithStack(err)
+	}
+
 	columns := make([]*model.Column, 0)
-	if err := s.db.Offset(offset).Limit(limit).Order("position").Find(&columns, "project_id = ?", projectId).Error; err != nil {
-		return nil, pkgErrors.WithStack(err)
+
+	findQuery := baseQuery.Session(&gorm.Session{})
+	findQuery = findQuery.Limit(limit).Offset(offset).Order("position")
+	if err := findQuery.Find(&columns, "project_id = ?", projectId).Error; err != nil {
+		return nil, 0, pkgErrors.WithStack(err)
 	}
 
 	resultColumns := make([]*domain.Column, len(columns))
@@ -30,19 +42,7 @@ func (s *columnStorage) FindAll(projectId uint, page, limit int) ([]*domain.Colu
 		resultColumns[i] = toDomainColumn(column)
 	}
 
-	return resultColumns, nil
-}
-
-func (s *columnStorage) GetAmountPages(columnId uint, limit int) (int, error) {
-	var count int64
-
-	if err := s.db.Model(&model.Column{}).Where("column_id = ?", columnId).Count(&count).Error; err != nil {
-		return 0, pkgErrors.WithStack(err)
-	}
-
-	amount := math.Ceil(float64(count) / float64(limit))
-
-	return int(amount), nil
+	return resultColumns, int(count), nil
 }
 
 func (s *columnStorage) FindById(columnId uint) (*domain.Column, error) {

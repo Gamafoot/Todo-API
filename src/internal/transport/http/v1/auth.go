@@ -108,7 +108,6 @@ func (h *handler) RefreshToken(c echo.Context) error {
 		if errors.Is(err, domain.ErrReshreshTokenNotFound) {
 			return c.NoContent(http.StatusUnauthorized)
 		}
-
 		return err
 	}
 
