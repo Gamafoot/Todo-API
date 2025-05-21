@@ -1,4 +1,4 @@
-CREATE FUNCTION weekly_stats(p_user_id bigint, week_start_date date)
+CREATE OR REPLACE FUNCTION weekly_stats(p_user_id bigint, week_start_date date)
     RETURNS TABLE(day date, count bigint)
     LANGUAGE plpgsql
 AS

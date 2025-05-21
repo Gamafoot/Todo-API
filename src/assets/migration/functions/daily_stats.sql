@@ -1,4 +1,4 @@
-CREATE FUNCTION daily_stats(p_user_id bigint, p_current_date date)
+CREATE OR REPLACE FUNCTION daily_stats(p_user_id bigint, p_current_date date)
     RETURNS TABLE(hour integer, count integer)
     LANGUAGE plpgsql
 AS

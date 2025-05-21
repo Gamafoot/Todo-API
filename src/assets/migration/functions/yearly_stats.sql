@@ -1,4 +1,4 @@
-CREATE FUNCTION yearly_stats(p_user_id bigint, year_num integer)
+CREATE OR REPLACE FUNCTION yearly_stats(p_user_id bigint, year_num integer)
     RETURNS TABLE(month integer, count bigint)
     LANGUAGE plpgsql
 AS

@@ -1,4 +1,4 @@
-CREATE FUNCTION monthly_stats(p_user_id bigint, year_num integer, month_num integer)
+CREATE OR REPLACE FUNCTION monthly_stats(p_user_id bigint, year_num integer, month_num integer)
     RETURNS TABLE(day date, count bigint)
     LANGUAGE plpgsql
 AS
