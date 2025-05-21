@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION public.tasks_fix_positions_after_delete(
-    p_old_column_id integer,
-    p_old_position integer
+    p_old_column_id bigint,
+    p_old_position bigint
 )
 RETURNS VOID AS $$
 BEGIN
