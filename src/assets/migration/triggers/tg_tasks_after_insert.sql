@@ -4,4 +4,4 @@ CREATE TRIGGER tg_tasks_after_insert
 AFTER INSERT
 ON tasks
 FOR EACH ROW
-EXECUTE PROCEDURE tg_tasks_move_to_first_position();
+EXECUTE PROCEDURE tg_tasks_init_position();
