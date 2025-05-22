@@ -1,6 +1,6 @@
-CREATE OR REPLACE FUNCTION public.tasks_set_default_position(
-    p_column_id integer,
-    p_task_id integer
+CREATE OR REPLACE FUNCTION tasks_set_default_position(
+    p_column_id bigint,
+    p_task_id bigint
 )
 RETURNS VOID AS $$
 DECLARE

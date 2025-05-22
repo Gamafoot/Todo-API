@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION tasks_move_to_position(
-    p_column_id integer, 
-    p_task_id integer, 
+    p_column_id bigint, 
+    p_task_id bigint, 
     p_new_position integer
 )
 RETURNS VOID AS $$
@@ -22,7 +22,6 @@ BEGIN
         RETURN;
     END IF;
     
-    -- Получаем максимальную позицию для соответствующего архивированного статуса
     SELECT COALESCE(MAX(position), 1) INTO v_max_position
     FROM tasks 
     WHERE column_id = p_column_id;

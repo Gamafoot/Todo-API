@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.tasks_fix_positions_after_delete(
+CREATE OR REPLACE FUNCTION tasks_fix_positions_after_delete(
     p_old_column_id bigint,
     p_old_position bigint
 )
