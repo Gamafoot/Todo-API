@@ -5,7 +5,7 @@ import "time"
 type Task struct {
 	Id          uint       `gorm:"primaryKey"`
 	ColumnId    uint       `gorm:"not null"`
-	Name        string     `gorm:"type:varchar(25);not null"`
+	Name        string     `gorm:"type:varchar(50);not null"`
 	Description string     `gorm:"type:text"`
 	Status      *bool      `gorm:"default:false"`
 	CompletedAt *time.Time `gorm:"default:null"`
