@@ -70,7 +70,6 @@ func (s *taskService) Create(userId uint, input *domain.CreateTaskInput) (*domai
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, domain.ErrRecordNotFound
 		}
-
 		return nil, err
 	}
 

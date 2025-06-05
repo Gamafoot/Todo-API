@@ -6,7 +6,7 @@ type Task struct {
 	Id          uint       `gorm:"primaryKey"`
 	ColumnId    uint       `gorm:"not null"`
 	Name        string     `gorm:"type:varchar(50);not null"`
-	Description string     `gorm:"type:text"`
+	Description *string    `gorm:"type:text"`
 	Status      *bool      `gorm:"default:false"`
 	CompletedAt *time.Time `gorm:"default:null"`
 	Archived    *bool      `gorm:"default:false"`
