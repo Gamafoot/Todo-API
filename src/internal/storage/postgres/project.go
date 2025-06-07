@@ -98,10 +98,6 @@ func (s *projectStorage) IsOwned(userId, projectId uint) (bool, error) {
 	return isOwned, nil
 }
 
-type A struct {
-	Count int64
-}
-
 func (s *projectStorage) GetStats(projectId uint) (*domain.ProjectStats, error) {
 	var (
 		total     int64
@@ -132,6 +128,28 @@ func (s *projectStorage) GetStats(projectId uint) (*domain.ProjectStats, error) 
 		Completed: int(completed),
 		Overdue:   int(overdue),
 	}, nil
+}
+
+func (s *projectStorage) GetMetrics(projectId uint) (*domain.PreProjectMetrics, error) {
+	metrics := new(domain.PreProjectMetrics)
+
+	err := s.db.Raw("SELECT * FROM project_metrics(?)", projectId).Scan(&metrics).Error
+	if err != nil {
+		return nil, pkgErrors.WithStack(err)
+	}
+
+	return metrics, nil
+}
+
+func (s *projectStorage) GetProgress(projectId uint) ([]*domain.ProjectProgress, error) {
+	progress := make([]*domain.ProjectProgress, 0)
+
+	err := s.db.Raw("SELECT * FROM project_progress(?)", projectId).Scan(&progress).Error
+	if err != nil {
+		return nil, pkgErrors.WithStack(err)
+	}
+
+	return progress, nil
 }
 
 func toDomainProject(project *model.Project) *domain.Project {

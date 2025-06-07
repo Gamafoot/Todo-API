@@ -12,13 +12,10 @@ type ProjectService interface {
 	Delete(userId, projectId uint) error
 
 	ProjectStatsService
-	ProjectMetrics
 }
 
 type ProjectStatsService interface {
 	GetStats(userId, projectId uint) (*domain.ProjectStats, error)
-}
-
-type ProjectMetrics interface {
-	GetMetrics(userId, projectId uint) (*domain.Metrics, error)
+	GetMetrics(userId, projectId uint) (*domain.ProjectMetrics, error)
+	GetProgress(userId, projectId uint) ([]*domain.ProjectProgress, error)
 }

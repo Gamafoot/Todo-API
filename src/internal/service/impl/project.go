@@ -136,7 +136,7 @@ func (s *projectService) GetStats(userId, projectId uint) (*domain.ProjectStats,
 	return s.storage.Project.GetStats(projectId)
 }
 
-func (s *projectService) GetMetrics(userId, projectId uint) (*domain.Metrics, error) {
+func (s *projectService) GetMetrics(userId, projectId uint) (*domain.ProjectMetrics, error) {
 	ok, err := s.storage.Project.IsOwned(userId, projectId)
 	if err != nil {
 		return nil, err
@@ -146,12 +146,12 @@ func (s *projectService) GetMetrics(userId, projectId uint) (*domain.Metrics, er
 		return nil, domain.ErrUserNotOwnedRecord
 	}
 
-	preMetrics, err := s.storage.Metrics.GetMetrics(projectId)
+	preMetrics, err := s.storage.Project.GetMetrics(projectId)
 	if err != nil {
 		return nil, err
 	}
 
-	metrics := &domain.Metrics{
+	metrics := &domain.ProjectMetrics{
 		TotalTasks:  preMetrics.TotalTasks,
 		DoneTasks:   preMetrics.DoneTasks,
 		RemTasks:    preMetrics.RemTasks,
@@ -184,4 +184,17 @@ func (s *projectService) GetMetrics(userId, projectId uint) (*domain.Metrics, er
 	metrics.Status = status
 
 	return metrics, nil
+}
+
+func (s *projectService) GetProgress(userId, projectId uint) ([]*domain.ProjectProgress, error) {
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, domain.ErrUserNotOwnedRecord
+	}
+
+	return s.storage.Project.GetProgress(projectId)
 }

@@ -15,4 +15,6 @@ type ProjectStorage interface {
 
 type ProjectStatsStorage interface {
 	GetStats(projectId uint) (*domain.ProjectStats, error)
+	GetMetrics(projectId uint) (*domain.PreProjectMetrics, error)
+	GetProgress(projectId uint) ([]*domain.ProjectProgress, error)
 }

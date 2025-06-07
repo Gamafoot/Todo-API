@@ -1,4 +1,4 @@
-CREATE FUNCTION metrics(p_project_id bigint)
+CREATE FUNCTION project_metrics(p_project_id bigint)
     RETURNS TABLE(total_tasks integer, done_tasks integer, rem_tasks integer, days_elapsed integer, days_left integer)
     LANGUAGE plpgsql
 AS

@@ -16,7 +16,8 @@ func (h *handler) initProjectRoutes(api *echo.Group) {
 	api.PATCH("/projects/:project_id", h.UpdateProject)
 	api.DELETE("/projects/:project_id", h.DeleteProject)
 	api.GET("/projects/:project_id/stats", h.ProjectStats)
-	api.GET("/projects/:project_id/progress", h.ProjectMetrics)
+	api.GET("/projects/:project_id/metrics", h.ProjectMetrics)
+	api.GET("/projects/:project_id/progress", h.ProjectProgress)
 }
 
 // @Summary Список проектов
@@ -277,7 +278,7 @@ func (h *handler) ProjectStats(c echo.Context) error {
 // @Success 200 {object} domain.Metrics
 // @Failure 401
 // @Failure 404
-// @Router /api/v1/projects/{project_id}/progress [get]
+// @Router /api/v1/projects/{project_id}/metrics [get]
 func (h *handler) ProjectMetrics(c echo.Context) error {
 	userId, err := getUserIdFromContext(c)
 	if err != nil {
@@ -298,4 +299,35 @@ func (h *handler) ProjectMetrics(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, metrics)
+}
+
+// @Summary Прогресс проекта
+// @Tags project
+// @Produce json
+// @Security BearerAuth
+// @Param project_id path int true "ID проекта"
+// @Success 200 {object} domain.ProjectProgress
+// @Failure 401
+// @Failure 404
+// @Router /api/v1/projects/{project_id}/progress [get]
+func (h *handler) ProjectProgress(c echo.Context) error {
+	userId, err := getUserIdFromContext(c)
+	if err != nil {
+		return err
+	}
+
+	projectId, err := getUIntFromParam(c, "project_id")
+	if err != nil {
+		return err
+	}
+
+	progress, err := h.service.Project.GetProgress(userId, projectId)
+	if err != nil {
+		if errors.Is(err, domain.ErrUserNotOwnedRecord) {
+			return c.NoContent(http.StatusNotFound)
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, progress)
 }

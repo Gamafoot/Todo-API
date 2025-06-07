@@ -633,7 +633,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/projects/{project_id}/progress": {
+        "/api/v1/projects/{project_id}/metrics": {
             "get": {
                 "security": [
                     {
@@ -660,14 +660,47 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Metrics"
+                            "$ref": "#/definitions/domain.ProjectMetrics"
                         }
                     },
                     "401": {
                         "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/v1/projects/{project_id}/progress": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "Прогресс проекта",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID проекта",
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ProjectProgress"
+                        }
                     },
-                    "404": {
-                        "description": "Not Found"
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 }
             }
@@ -1339,7 +1372,33 @@ const docTemplate = `{
                 }
             }
         },
-        "domain.Metrics": {
+        "domain.Project": {
+            "type": "object",
+            "properties": {
+                "archived": {
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deadline": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ProjectMetrics": {
             "type": "object",
             "properties": {
                 "days_elapsed": {
@@ -1374,28 +1433,13 @@ const docTemplate = `{
                 }
             }
         },
-        "domain.Project": {
+        "domain.ProjectProgress": {
             "type": "object",
             "properties": {
-                "archived": {
-                    "type": "boolean"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "deadline": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
+                "count": {
                     "type": "integer"
                 },
-                "name": {
-                    "type": "string"
-                },
-                "updated_at": {
+                "day": {
                     "type": "string"
                 }
             }
