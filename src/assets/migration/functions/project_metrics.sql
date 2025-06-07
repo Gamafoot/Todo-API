@@ -29,5 +29,3 @@ BEGIN
 END;
 $$;
 
-ALTER FUNCTION metrics(bigint) OWNER TO postgres;
-
