@@ -696,7 +696,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.ProjectProgress"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.ProjectProgress"
+                            }
                         }
                     },
                     "401": {

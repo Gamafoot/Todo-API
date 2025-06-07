@@ -719,7 +719,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.ProjectProgress'
+            items:
+              $ref: '#/definitions/domain.ProjectProgress'
+            type: array
         "401":
           description: Unauthorized
       security:
