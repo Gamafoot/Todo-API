@@ -86,7 +86,24 @@ definitions:
     - password
     - username
     type: object
-  domain.Metrics:
+  domain.Project:
+    properties:
+      archived:
+        type: boolean
+      created_at:
+        type: string
+      deadline:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.ProjectMetrics:
     properties:
       days_elapsed:
         type: integer
@@ -109,21 +126,11 @@ definitions:
       v_req:
         type: number
     type: object
-  domain.Project:
+  domain.ProjectProgress:
     properties:
-      archived:
-        type: boolean
-      created_at:
-        type: string
-      deadline:
-        type: string
-      description:
-        type: string
-      id:
+      count:
         type: integer
-      name:
-        type: string
-      updated_at:
+      day:
         type: string
     type: object
   domain.ProjectStats:
@@ -676,6 +683,28 @@ paths:
       summary: Список колонок
       tags:
       - column
+  /api/v1/projects/{project_id}/metrics:
+    get:
+      parameters:
+      - description: ID проекта
+        in: path
+        name: project_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ProjectMetrics'
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Метрики проекта
+      tags:
+      - project
   /api/v1/projects/{project_id}/progress:
     get:
       parameters:
@@ -690,14 +719,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.Metrics'
+            $ref: '#/definitions/domain.ProjectProgress'
         "401":
           description: Unauthorized
-        "404":
-          description: Not Found
       security:
       - BearerAuth: []
-      summary: Метрики проекта
+      summary: Прогресс проекта
       tags:
       - project
   /api/v1/projects/{project_id}/stats:

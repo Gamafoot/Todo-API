@@ -159,9 +159,23 @@ func (s *projectService) GetMetrics(userId, projectId uint) (*domain.ProjectMetr
 		DaysLeft:    preMetrics.DaysLeft,
 	}
 
-	metrics.VReal = float64(metrics.DoneTasks) / float64(metrics.DaysElapsed)
-	metrics.VReq = float64(metrics.RemTasks) / float64(metrics.DaysLeft)
-	metrics.PerceptionDone = int((float64(metrics.DoneTasks) / float64(metrics.TotalTasks)) * 100)
+	if metrics.DaysElapsed == 0 {
+		metrics.VReal = float64(metrics.DoneTasks)
+	} else {
+		metrics.VReal = float64(metrics.DoneTasks) / float64(metrics.DaysElapsed)
+	}
+
+	if metrics.DaysLeft == 0 {
+		metrics.VReq = float64(metrics.RemTasks)
+	} else {
+		metrics.VReq = float64(metrics.RemTasks) / float64(metrics.DaysLeft)
+	}
+
+	if metrics.TotalTasks == 0 {
+		metrics.PerceptionDone = 0
+	} else {
+		metrics.PerceptionDone = int((float64(metrics.DoneTasks) / float64(metrics.TotalTasks)) * 100)
+	}
 
 	if metrics.VReal > 0 {
 		offset := math.Ceil(float64(metrics.RemTasks) / metrics.VReal)

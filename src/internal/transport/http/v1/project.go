@@ -275,9 +275,8 @@ func (h *handler) ProjectStats(c echo.Context) error {
 // @Produce json
 // @Security BearerAuth
 // @Param project_id path int true "ID проекта"
-// @Success 200 {object} domain.Metrics
+// @Success 200 {object} domain.ProjectMetrics
 // @Failure 401
-// @Failure 404
 // @Router /api/v1/projects/{project_id}/metrics [get]
 func (h *handler) ProjectMetrics(c echo.Context) error {
 	userId, err := getUserIdFromContext(c)
@@ -308,7 +307,6 @@ func (h *handler) ProjectMetrics(c echo.Context) error {
 // @Param project_id path int true "ID проекта"
 // @Success 200 {object} domain.ProjectProgress
 // @Failure 401
-// @Failure 404
 // @Router /api/v1/projects/{project_id}/progress [get]
 func (h *handler) ProjectProgress(c echo.Context) error {
 	userId, err := getUserIdFromContext(c)
