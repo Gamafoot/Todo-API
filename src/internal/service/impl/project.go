@@ -2,9 +2,11 @@ package impl
 
 import (
 	"errors"
+	"math"
 	"root/internal/config"
 	"root/internal/domain"
 	"root/internal/storage"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -132,4 +134,54 @@ func (s *projectService) GetStats(userId, projectId uint) (*domain.ProjectStats,
 	}
 
 	return s.storage.Project.GetStats(projectId)
+}
+
+func (s *projectService) GetMetrics(userId, projectId uint) (*domain.Metrics, error) {
+	ok, err := s.storage.Project.IsOwned(userId, projectId)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, domain.ErrUserNotOwnedRecord
+	}
+
+	preMetrics, err := s.storage.Metrics.GetMetrics(projectId)
+	if err != nil {
+		return nil, err
+	}
+
+	metrics := &domain.Metrics{
+		TotalTasks:  preMetrics.TotalTasks,
+		DoneTasks:   preMetrics.DoneTasks,
+		RemTasks:    preMetrics.RemTasks,
+		DaysElapsed: preMetrics.DaysElapsed,
+		DaysLeft:    preMetrics.DaysLeft,
+	}
+
+	metrics.VReal = float64(metrics.DoneTasks) / float64(metrics.DaysElapsed)
+	metrics.VReq = float64(metrics.RemTasks) / float64(metrics.DaysLeft)
+	metrics.PerceptionDone = int((float64(metrics.DoneTasks) / float64(metrics.TotalTasks)) * 100)
+
+	if metrics.VReal > 0 {
+		offset := math.Ceil(float64(metrics.RemTasks) / metrics.VReal)
+
+		now := time.Now().UTC()
+		now = now.Add(time.Duration(offset) * 24 * time.Hour)
+		metrics.ProjectedFinishDate = now
+	}
+
+	status := "undefined"
+
+	if metrics.VReal > metrics.VReq {
+		status = "green"
+	} else if metrics.VReal < metrics.VReq && metrics.DaysLeft > 0 {
+		status = "yellow"
+	} else if metrics.DaysLeft == 0 || (metrics.VReal == 0 && metrics.RemTasks > 0) {
+		status = "red"
+	}
+
+	metrics.Status = status
+
+	return metrics, nil
 }

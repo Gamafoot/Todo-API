@@ -633,6 +633,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/projects/{project_id}/progress": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "Метрики проекта",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID проекта",
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Metrics"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
         "/api/v1/projects/{project_id}/stats": {
             "get": {
                 "security": [
@@ -1300,6 +1339,41 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.Metrics": {
+            "type": "object",
+            "properties": {
+                "days_elapsed": {
+                    "type": "integer"
+                },
+                "days_left": {
+                    "type": "integer"
+                },
+                "done_tasks": {
+                    "type": "integer"
+                },
+                "perception_done": {
+                    "type": "integer"
+                },
+                "projected_finish_date": {
+                    "type": "string"
+                },
+                "rem_tasks": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total_tasks": {
+                    "type": "integer"
+                },
+                "v_real": {
+                    "type": "number"
+                },
+                "v_req": {
+                    "type": "number"
+                }
+            }
+        },
         "domain.Project": {
             "type": "object",
             "properties": {
@@ -1445,9 +1519,6 @@ const docTemplate = `{
         },
         "domain.UpdateProjectInput": {
             "type": "object",
-            "required": [
-                "name"
-            ],
             "properties": {
                 "archived": {
                     "type": "boolean"

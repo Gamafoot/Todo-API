@@ -14,6 +14,7 @@ type Storage struct {
 	Task    TaskStorage
 	Subtask SubtaskStorage
 	Stats   StatsStorage
+	Metrics MetricsStorage
 }
 
 func NewPostgresStorage(db *gorm.DB) *Storage {
@@ -25,5 +26,6 @@ func NewPostgresStorage(db *gorm.DB) *Storage {
 		Task:    postgres.NewTaskStorage(db),
 		Subtask: postgres.NewSubtaskStorage(db),
 		Stats:   postgres.NewStatsStorage(db),
+		Metrics: postgres.NewMetricsStorage(db),
 	}
 }
