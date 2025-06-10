@@ -47,6 +47,7 @@ func (h *handler) InitRoutes(api *echo.Group) {
 			h.initTaskRoutes(requiredAuth)
 			h.initSubTaskRoutes(requiredAuth)
 			h.initStatsRoutes(requiredAuth)
+			h.initHeatmapRoutes(requiredAuth)
 		}
 	}
 }

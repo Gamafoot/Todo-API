@@ -2,6 +2,7 @@ package impl
 
 import (
 	"errors"
+	"log"
 	"root/internal/config"
 	"root/internal/domain"
 	"root/internal/storage"
@@ -73,6 +74,11 @@ func (s *taskService) Create(userId uint, input *domain.CreateTaskInput) (*domai
 		return nil, err
 	}
 
+	err = s.storage.Heatmap.AddActivity(userId)
+	if err != nil {
+		log.Printf("%+v\n", err)
+	}
+
 	return task, nil
 }
 
@@ -133,6 +139,11 @@ func (s *taskService) Update(userId, taskId uint, input *domain.UpdateTaskInput)
 		task.Position = input.Position
 	}
 
+	err = s.storage.Heatmap.AddActivity(userId)
+	if err != nil {
+		log.Printf("%+v\n", err)
+	}
+
 	return task, nil
 }
 
@@ -151,6 +162,11 @@ func (s *taskService) Delete(userId, taskId uint) error {
 			return domain.ErrRecordNotFound
 		}
 		return err
+	}
+
+	err = s.storage.Heatmap.RemoveActivity(userId)
+	if err != nil {
+		log.Printf("%+v\n", err)
 	}
 
 	return nil

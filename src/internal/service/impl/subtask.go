@@ -2,6 +2,7 @@ package impl
 
 import (
 	"errors"
+	"log"
 	"root/internal/config"
 	"root/internal/domain"
 	"root/internal/storage"
@@ -71,6 +72,11 @@ func (s *subtaskService) Create(userId uint, input *domain.CreateSubtaskInput) (
 		return nil, err
 	}
 
+	err = s.storage.Heatmap.AddActivity(userId)
+	if err != nil {
+		log.Printf("%+v\n", err)
+	}
+
 	return subtask, nil
 }
 
@@ -114,6 +120,11 @@ func (s *subtaskService) Update(userId, subtaskId uint, input *domain.UpdateSubt
 		subtask.Position = input.Position
 	}
 
+	err = s.storage.Heatmap.AddActivity(userId)
+	if err != nil {
+		log.Printf("%+v\n", err)
+	}
+
 	return subtask, nil
 }
 
@@ -132,6 +143,11 @@ func (s *subtaskService) Delete(userId, subtaskId uint) error {
 			return domain.ErrRecordNotFound
 		}
 		return err
+	}
+
+	err = s.storage.Heatmap.RemoveActivity(userId)
+	if err != nil {
+		log.Printf("%+v\n", err)
 	}
 
 	return nil

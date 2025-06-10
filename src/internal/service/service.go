@@ -14,6 +14,7 @@ type Service struct {
 	Task    TaskService
 	Subtask SubtaskService
 	Stats   StatsService
+	Heatmap Heatmap
 }
 
 func NewService(cfg *config.Config, storage *storage.Storage, tokenManager jwt.TokenManager) *Service {
@@ -24,5 +25,6 @@ func NewService(cfg *config.Config, storage *storage.Storage, tokenManager jwt.T
 		Task:    impl.NewTaskService(cfg, storage),
 		Subtask: impl.NewSubtaskService(cfg, storage),
 		Stats:   impl.NewStatsService(cfg, storage),
+		Heatmap: impl.NewHeatmapService(cfg, storage),
 	}
 }

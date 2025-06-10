@@ -2,6 +2,7 @@ package impl
 
 import (
 	"errors"
+	"log"
 	"math"
 	"root/internal/config"
 	"root/internal/domain"
@@ -66,6 +67,11 @@ func (s *projectService) Create(userId uint, input *domain.CreateProjectInput) (
 		return nil, err
 	}
 
+	err = s.storage.Heatmap.AddActivity(userId)
+	if err != nil {
+		log.Printf("%+v\n", err)
+	}
+
 	return project, nil
 }
 
@@ -100,6 +106,11 @@ func (s *projectService) Update(userId, projectId uint, input *domain.UpdateProj
 		return nil, err
 	}
 
+	err = s.storage.Heatmap.AddActivity(userId)
+	if err != nil {
+		log.Printf("%+v\n", err)
+	}
+
 	return project, nil
 }
 
@@ -118,6 +129,11 @@ func (s *projectService) Delete(userId, projectId uint) error {
 			return domain.ErrRecordNotFound
 		}
 		return err
+	}
+
+	err = s.storage.Heatmap.RemoveActivity(userId)
+	if err != nil {
+		log.Printf("%+v\n", err)
 	}
 
 	return nil
