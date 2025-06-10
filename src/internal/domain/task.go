@@ -18,7 +18,7 @@ type Task struct {
 type CreateTaskInput struct {
 	ColumnId    uint       `json:"column_id" validate:"required"`
 	Name        string     `json:"name" validate:"required,gte=3,lte=50"`
-	Description *string    `json:"description" validate:"required"`
+	Description *string    `json:"description"`
 	Deadline    *time.Time `json:"deadline"`
 }
 
