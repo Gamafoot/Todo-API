@@ -21,7 +21,7 @@ type CreateProjectInput struct {
 
 type UpdateProjectInput struct {
 	Name        string     `json:"name" validate:"omitempty,gte=3,lte=50"`
-	Description string     `json:"description"`
+	Description *string    `json:"description"`
 	Archived    *bool      `json:"archived"`
 	Deadline    *time.Time `json:"deadline"`
 }
