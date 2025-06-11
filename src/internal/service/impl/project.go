@@ -201,14 +201,28 @@ func (s *projectService) GetMetrics(userId, projectId uint) (*domain.ProjectMetr
 		metrics.ProjectedFinishDate = now
 	}
 
-	status := "undefined"
+	project, err := s.storage.Project.FindById(projectId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrRecordNotFound
+		}
+		return nil, err
+	}
 
-	if metrics.VReal > metrics.VReq {
-		status = "green"
-	} else if metrics.VReal < metrics.VReq && metrics.DaysLeft > 0 {
-		status = "yellow"
-	} else if metrics.DaysLeft == 0 || (metrics.VReal == 0 && metrics.RemTasks > 0) {
+	var status string
+
+	now := time.Now().UTC()
+
+	if project.Deadline.Before(now) {
 		status = "red"
+	} else {
+		if metrics.VReal > metrics.VReq {
+			status = "green"
+		} else if metrics.VReal < metrics.VReq && metrics.DaysLeft > 0 {
+			status = "yellow"
+		} else if metrics.DaysLeft == 0 || (metrics.VReal == 0 && metrics.RemTasks > 0) {
+			status = "red"
+		}
 	}
 
 	metrics.Status = status
