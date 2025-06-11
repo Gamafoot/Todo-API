@@ -1,4 +1,4 @@
-CREATE FUNCTION project_progress(p_project_id bigint)
+CREATE OR REPLACE FUNCTION project_progress(p_project_id bigint)
     RETURNS TABLE(day date, count bigint)
     LANGUAGE plpgsql
 AS
