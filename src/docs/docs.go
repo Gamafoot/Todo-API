@@ -1351,7 +1351,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "column_id",
-                "description",
                 "name"
             ],
             "properties": {
@@ -1396,14 +1395,8 @@ const docTemplate = `{
                 "count": {
                     "type": "integer"
                 },
-                "date": {
+                "day": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "userId": {
-                    "type": "integer"
                 }
             }
         },
@@ -1442,6 +1435,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "status": {
+                    "type": "boolean"
                 },
                 "updated_at": {
                     "type": "string"
