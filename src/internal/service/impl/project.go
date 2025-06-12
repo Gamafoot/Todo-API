@@ -209,19 +209,21 @@ func (s *projectService) GetMetrics(userId, projectId uint) (*domain.ProjectMetr
 		return nil, err
 	}
 
-	var status string
+	status := "undefined"
 
-	now := time.Now().UTC()
+	if project.Deadline != nil {
+		now := time.Now().UTC()
 
-	if project.Deadline.Before(now) {
-		status = "red"
-	} else {
-		if metrics.VReal > metrics.VReq {
-			status = "green"
-		} else if metrics.VReal < metrics.VReq && metrics.DaysLeft > 0 {
-			status = "yellow"
-		} else if metrics.DaysLeft == 0 || (metrics.VReal == 0 && metrics.RemTasks > 0) {
+		if project.Deadline.Before(now) {
 			status = "red"
+		} else {
+			if metrics.VReal > metrics.VReq {
+				status = "green"
+			} else if metrics.VReal < metrics.VReq && metrics.DaysLeft > 0 {
+				status = "yellow"
+			} else if metrics.DaysLeft == 0 || (metrics.VReal == 0 && metrics.RemTasks > 0) {
+				status = "red"
+			}
 		}
 	}
 
