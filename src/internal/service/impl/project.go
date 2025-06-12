@@ -90,6 +90,7 @@ func (s *projectService) Update(userId, projectId uint, input *domain.UpdateProj
 		Name:        input.Name,
 		Description: input.Description,
 		Archived:    input.Archived,
+		Deadline:    input.Deadline,
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -210,19 +211,15 @@ func (s *projectService) GetMetrics(userId, projectId uint) (*domain.ProjectMetr
 	}
 
 	if project.Deadline != nil {
-		status := ""
+		status := "red"
 
 		now := time.Now().UTC()
 
-		if project.Deadline.Before(now) {
-			status = "red"
-		} else {
-			if metrics.VReal > metrics.VReq {
+		if !project.Deadline.Before(now) {
+			if metrics.VReal > metrics.VReq || metrics.PerceptionDone == 100 {
 				status = "green"
 			} else if metrics.VReal < metrics.VReq && metrics.DaysLeft > 0 {
 				status = "yellow"
-			} else {
-				status = "red"
 			}
 		}
 
