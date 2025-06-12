@@ -211,15 +211,30 @@ func (s *projectService) GetMetrics(userId, projectId uint) (*domain.ProjectMetr
 	}
 
 	if project.Deadline != nil {
-		status := "red"
-
 		now := time.Now().UTC()
 
+		status := "red"
+
 		if !project.Deadline.Before(now) {
-			if metrics.VReal > metrics.VReq || metrics.PerceptionDone == 100 {
+			switch {
+			case metrics.RemTasks == 0:
+				// Все задачи выполнены — зеленый
 				status = "green"
-			} else if metrics.VReal < metrics.VReq && metrics.DaysLeft > 0 {
+			case metrics.DaysLeft <= 0:
+				// Дедлайн прошёл, но задачи остались — красный
+				status = "red"
+			case metrics.VReal >= metrics.VReq && metrics.VReq > 0:
+				// Успевает (v_real ≥ v_req) — зеленый
+				status = "green"
+			case metrics.VReal > 0 && metrics.VReal < metrics.VReq:
+				// Работает, но не успевает (v_real < v_req) — желтый
 				status = "yellow"
+			case metrics.VReal == 0 && metrics.DaysLeft > 0:
+				// Не начал работу (v_real = 0), но время есть — желтый
+				status = "yellow"
+			default:
+				// Остальные случаи (например, days_left = 0 и rem_tasks > 0) — красный
+				status = "red"
 			}
 		}
 
