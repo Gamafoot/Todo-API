@@ -9,6 +9,7 @@ type Project struct {
 	Archived    *bool      `json:"archived"`
 	Description *string    `json:"description"`
 	Deadline    *time.Time `json:"deadline"`
+	Status      bool       `json:"status"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 }

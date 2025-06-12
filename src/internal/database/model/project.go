@@ -12,6 +12,7 @@ type Project struct {
 	CreatedAt   time.Time  `gorm:"not null"`
 	UpdatedAt   time.Time  `gorm:"not null"`
 	User        User       `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Status      bool
 }
 
 func (p Project) TableName() string {

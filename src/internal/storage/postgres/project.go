@@ -19,31 +19,54 @@ func NewProjectStorage(db *gorm.DB) *projectStorage {
 func (s *projectStorage) FindAll(userId uint, options *domain.SearchProjectOptions, page, limit int) ([]*domain.Project, int, error) {
 	offset := (page - 1) * limit
 
-	baseQuery := s.db.Model(model.Project{})
-	baseQuery = baseQuery.Where("user_id = ?", userId).Where("archived = ?", options.Archived)
+	// Субзапрос для подсчета задач и определения статуса
+	taskStatsSubquery := s.db.Model(&model.Task{}).
+		Select(`
+            columns.project_id,
+            COUNT(tasks.id) as task_count,
+            BOOL_AND(COALESCE(tasks.status, false)) as all_completed
+        `).
+		Joins("JOIN columns ON columns.id = tasks.column_id").
+		Where("tasks.archived IS NULL OR tasks.archived = false").
+		Group("columns.project_id")
+
+	// Субзапрос для определения финального статуса
+	statusSubquery := s.db.Table("(?) as task_stats", taskStatsSubquery).
+		Select(`
+            project_id,
+            CASE
+                WHEN task_count = 0 THEN false
+                ELSE all_completed
+            END as computed_status
+        `)
+
+	// Базовый запрос
+	baseQuery := s.db.Model(&model.Project{}).
+		Select("projects.*, COALESCE(status_subquery.computed_status, false) as status").
+		Joins("LEFT JOIN (?) as status_subquery ON projects.id = status_subquery.project_id", statusSubquery).
+		Where("projects.user_id = ?", userId).
+		Where("projects.archived = ?", options.Archived)
 
 	if len(options.Pattern) > 0 {
-		pattern := options.Pattern
-		pattern = "%" + pattern + "%"
-
-		baseQuery.Where(
-			"name LIKE ? OR description LIKE ?",
+		pattern := "%" + options.Pattern + "%"
+		baseQuery = baseQuery.Where(
+			"projects.name LIKE ? OR projects.description LIKE ?",
 			pattern,
 			pattern,
 		)
 	}
 
+	// Подсчет общего количества
 	var count int64
-
 	countQuery := baseQuery.Session(&gorm.Session{})
 	if err := countQuery.Count(&count).Error; err != nil {
 		return nil, 0, pkgErrors.WithStack(err)
 	}
 
-	projects := make([]*model.Project, 0)
-
+	// Получение данных с пагинацией
+	var projects []*model.Project
 	findQuery := baseQuery.Session(&gorm.Session{})
-	findQuery = findQuery.Offset(offset).Limit(limit).Order("updated_at desc")
+	findQuery = findQuery.Offset(offset).Limit(limit).Order(options.Order + " DESC")
 	if err := findQuery.Find(&projects).Error; err != nil {
 		return nil, 0, pkgErrors.WithStack(err)
 	}
@@ -57,8 +80,34 @@ func (s *projectStorage) FindAll(userId uint, options *domain.SearchProjectOptio
 }
 
 func (s *projectStorage) FindById(id uint) (*domain.Project, error) {
+	// Субзапрос для подсчета задач и определения статуса
+	taskStatsSubquery := s.db.Model(&model.Task{}).
+		Select(`
+            columns.project_id,
+            COUNT(tasks.id) as task_count,
+            BOOL_AND(COALESCE(tasks.status, false)) as all_completed
+        `).
+		Joins("JOIN columns ON columns.id = tasks.column_id").
+		Where("tasks.archived IS NULL OR tasks.archived = false").
+		Group("columns.project_id")
+
+	// Субзапрос для определения финального статуса
+	statusSubquery := s.db.Table("(?) as task_stats", taskStatsSubquery).
+		Select(`
+            project_id,
+            CASE 
+                WHEN task_count = 0 THEN false
+                ELSE all_completed
+            END as computed_status
+        `)
+
+	// Основной запрос с добавлением вычисляемого поля status
 	project := new(model.Project)
-	if err := s.db.Find(&project, "id = ?", id).Error; err != nil {
+	if err := s.db.Model(&model.Project{}).
+		Select("projects.*, COALESCE(status_subquery.computed_status, false) as status").
+		Joins("LEFT JOIN (?) as status_subquery ON projects.id = status_subquery.project_id", statusSubquery).
+		Where("projects.id = ?", id).
+		First(project).Error; err != nil {
 		return nil, pkgErrors.WithStack(err)
 	}
 
@@ -162,6 +211,7 @@ func toDomainProject(project *model.Project) *domain.Project {
 		Archived:    project.Archived,
 		CreatedAt:   project.CreatedAt,
 		UpdatedAt:   project.UpdatedAt,
+		Status:      project.Status,
 	}
 }
 
@@ -175,6 +225,7 @@ func toModelProject(project *domain.Project) *model.Project {
 		Archived:    project.Archived,
 		CreatedAt:   project.CreatedAt,
 		UpdatedAt:   project.UpdatedAt,
+		Status:      project.Status,
 	}
 }
 
