@@ -221,7 +221,7 @@ func (s *projectService) GetMetrics(userId, projectId uint) (*domain.ProjectMetr
 				status = "green"
 			} else if metrics.VReal < metrics.VReq && metrics.DaysLeft > 0 {
 				status = "yellow"
-			} else if metrics.DaysLeft == 0 || (metrics.VReal == 0 && metrics.RemTasks > 0) {
+			} else {
 				status = "red"
 			}
 		}
