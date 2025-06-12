@@ -62,7 +62,7 @@ type ProjectMetrics struct {
 	VReq                float64   `json:"v_req"`
 	PerceptionDone      int       `json:"perception_done"`
 	ProjectedFinishDate time.Time `json:"projected_finish_date"`
-	Status              string    `json:"status"`
+	Status              *string   `json:"status"`
 }
 
 type ProjectProgress struct {

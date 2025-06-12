@@ -209,9 +209,9 @@ func (s *projectService) GetMetrics(userId, projectId uint) (*domain.ProjectMetr
 		return nil, err
 	}
 
-	status := "undefined"
-
 	if project.Deadline != nil {
+		status := ""
+
 		now := time.Now().UTC()
 
 		if project.Deadline.Before(now) {
@@ -225,9 +225,9 @@ func (s *projectService) GetMetrics(userId, projectId uint) (*domain.ProjectMetr
 				status = "red"
 			}
 		}
-	}
 
-	metrics.Status = status
+		metrics.Status = &status
+	}
 
 	return metrics, nil
 }
