@@ -3,6 +3,7 @@ package v1
 import (
 	"root/internal/config"
 	"root/internal/service"
+	mymiddleware "root/internal/transport/middleware"
 	"root/pkg/jwt"
 
 	"github.com/labstack/echo/v4"
@@ -31,7 +32,7 @@ func (h *handler) InitRoutes(api *echo.Group) {
 			AllowHeaders:     h.config.Cors.AllowHeaders,
 			AllowCredentials: true,
 		}),
-		middleware.Logger(),
+		mymiddleware.Logger,
 	)
 
 	h.initSwaggerRoutes(api)
