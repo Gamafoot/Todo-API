@@ -16,13 +16,16 @@ cors:
   origins:
     - "http://localhost:7000"
     - "http://localhost:5173"
+    - "http://62.60.236.68:3000"
   methods:
     - "GET"
     - "POST"
     - "PUT"
     - "PATCH"
     - "DELETE"
+    - "OPTIONS"
   headers:
+    - "User-Agent"
     - "Origin"
     - "Content-Type"
     - "Authorization"
